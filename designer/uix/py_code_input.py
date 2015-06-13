@@ -114,7 +114,6 @@ class PyScrollView(ScrollView):
         '''Event handler to cancel the completion
         '''
         if self.bubble.parent is not None:
-            self.bubble.show_completions([])
             self.bubble.parent.remove_widget(self.bubble)
             self.is_bubble_visible = False
 
