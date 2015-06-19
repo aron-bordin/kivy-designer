@@ -9,6 +9,13 @@ Hi!
 
 In this week I developed some extra features to **Kivy Designer** not listed in my proposal. In the firsts weeks I made a good advance on my proposal, so now I have some times to add some important features to the project.
 
+Check the video with some of this features working:
+
+<div align="center">
+	<iframe width="560" height="315" src="https://www.youtube.com/embed/wMdBLvUT0wc" frameborder="0" allowfullscreen></iframe>
+</div>
+
+
 
 ### Better Python Code Input - Jedi
 
