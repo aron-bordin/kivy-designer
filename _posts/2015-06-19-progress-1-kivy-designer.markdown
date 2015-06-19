@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Progress Report 1"
-date:   2015-06-18
+date:   2015-06-19
 ---
 
 Hi!
