@@ -16,7 +16,6 @@ I did some modifications to Events and Properties UI, and fixed some related bug
 * Added a canvas line between properties and event names
 * Displaying Info Bubble in the correct position (information about the current event being modified)
 
-# TODO - add screenshot
 
 ### Designer Code Input
 
@@ -30,6 +29,9 @@ I did some modifications to Events and Properties UI, and fixed some related bug
 Implemented a closable and auto sizable TabHeader to Designer Code Input. Now it's possible to close open tabs :)
 
 Implemented "smart" tabs design. Change the tab style to inform if there is something wrong with the source code, if the content has modification, and to say the git status. (Only design, not yet working)
+
+![](https://cloud.githubusercontent.com/assets/4960137/8394232/c619c3f4-1d04-11e5-9395-05c876e779d0.png)
+
 
 ### Bug fixes
 
