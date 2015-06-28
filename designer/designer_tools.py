@@ -1,13 +1,74 @@
 import datetime
 import os
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.popup import Popup
 import designer
 
 from kivy.event import EventDispatcher
-from kivy.properties import ObjectProperty
+from kivy.properties import ObjectProperty, StringProperty
 
-from designer.helper_functions import ignore_proj_watcher
+from designer.helper_functions import ignore_proj_watcher, show_alert
 
 
+#### UIs ####
+class ToolSetupPy(BoxLayout):
+
+    path = StringProperty('')
+    '''setup.py path
+       Instance of :class:`kivy.config.StringProperty`
+    '''
+
+    __events__ = ('on_create', 'on_cancel', )
+
+    @ignore_proj_watcher
+    def create(self):
+        '''Create the setup.py
+        '''
+        package_name = self.ids.package_name.text
+        version = self.ids.version.text
+        url = self.ids.url.text
+        license = self.ids.license.text
+        author = self.ids.author.text
+        author_email = self.ids.author_email.text
+        description = self.ids.description.text
+
+        setup_template = '''from distutils.core import setup
+
+setup(
+    name='%s',
+    version='%s',
+    packages=[],
+    url='%s',
+    license='%s',
+    author='%s',
+    author_email='%s',
+    description='%s',
+)
+'''
+        setup = setup_template % (
+            package_name,
+            version,
+            url,
+            license,
+            author,
+            author_email,
+            description,
+        )
+
+        f = open(self.path, 'w').write(setup)
+
+        self.dispatch('on_create')
+
+    def on_create(self, *args):
+        '''Event handler to "Create" button'''
+        pass
+
+    def on_cancel(self, *args):
+        '''Event handler to "Cancel" button'''
+        pass
+
+
+### Tools ###
 class DesignerTools(EventDispatcher):
 
     designer = ObjectProperty()
@@ -61,3 +122,26 @@ class DesignerTools(EventDispatcher):
         self.designer.ui_creator.tab_pannel.switch_to(
             self.designer.ui_creator.tab_pannel.tab_list[2])
         self.designer.ui_creator.kivy_console.run_command(cmd)
+
+    def create_setup_py(self):
+        proj_loader = self.designer.project_loader
+        proj_dir = proj_loader.proj_dir
+        designer_content = self.designer.designer_content
+
+        setup_path = os.path.join(proj_dir, 'setup.py')
+        if os.path.exists(setup_path):
+            show_alert('Create setup.py', 'setup.py already exists!')
+            return False
+
+        content = ToolSetupPy(path=setup_path)
+        self._popup = Popup(title='Create setup.py', content=content,
+                            size_hint=(None, None), size=(550, 400),
+                            auto_dismiss=False)
+        content.bind(on_cancel=self._popup.dismiss)
+
+        def on_create(*args):
+            designer_content.update_tree_view(proj_loader)
+            self._popup.dismiss()
+
+        content.bind(on_create=on_create)
+        self._popup.open()
