@@ -1252,9 +1252,13 @@
                 dropdown_cls: ContextMenu
                 disabled: True
                 DesignerActionButton:
-                    id: actn_btn_run_proj
+                    id: actn_btn_export_png
                     text: 'Export .png'
                     on_release: root.designer_tools.export_png()
+                DesignerActionButton:
+                    id: actn_btn_check_pep8
+                    text: 'Check PEP 8'
+                    on_release: root.designer_tools.check_pep8()
 
 
             DesignerActionGroup:
