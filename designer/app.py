@@ -55,6 +55,7 @@ from designer.eventviewer import EventViewer
 from designer.uix.designer_action_items import DesignerActionButton, \
     DesignerActionProfileCheck
 from designer.help_dialog import HelpDialog, AboutDialog
+from designer.designer_git import  DesignerGit
 
 NEW_PROJECT_DIR_NAME = 'new_proj'
 NEW_TEMPLATES_DIR = 'new_templates'
@@ -71,6 +72,10 @@ class Designer(FloatLayout):
 
     designer_tools = ObjectProperty(None)
     '''Instance of :class:`designer.designer_tools.DesignerTools`
+    '''
+
+    designer_git = ObjectProperty(None)
+    '''Instance of :class:`designer.designer_git.DesignerGit`
     '''
 
     statusbar = ObjectProperty(None)
@@ -872,6 +877,7 @@ class Designer(FloatLayout):
         Clock.schedule_once(partial(self.ui_creator.kivy_console.run_command,
             'cd %s' % (self.project_loader.proj_dir)
         ), 1)
+        self.designer_git.load_repo(self.project_loader.proj_dir)
 
     def _cancel_popup(self, *args):
         '''EventHandler for all self._popup when self._popup.content

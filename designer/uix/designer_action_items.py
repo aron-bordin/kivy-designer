@@ -36,6 +36,11 @@ class DesignerActionGroup(ActionGroup):
     pass
 
 
+class DesignerSubActionButton(ActionButton):
+
+    def __init__(self, **kwargs):
+        super(DesignerSubActionButton, self).__init__(**kwargs)
+
 class DesignerActionButton(ActionButton):
     '''DesignerActionButton is a ActionButton to the ActionBar menu
     '''

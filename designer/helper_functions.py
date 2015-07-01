@@ -1,6 +1,7 @@
 '''This file contains a few functions which are required by more than one
    module of Kivy Designer.
 '''
+import functools
 
 import os
 
@@ -99,6 +100,7 @@ def show_alert(title, msg, width=500, height=200):
 def ignore_proj_watcher(f):
     '''Function decorator to makes project watcher ignores file modification
     '''
+    @functools.wraps(f)
     def wrapper(*args, **kwargs):
         watcher = App.get_running_app().root.project_watcher
         watcher.stop()
