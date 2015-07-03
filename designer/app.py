@@ -1,4 +1,5 @@
 import webbrowser
+
 from designer.designer_tools import DesignerTools
 from designer.input_dialog import InputDialog
 from designer.profile_settings import ProfileSettings

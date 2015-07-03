@@ -41,6 +41,11 @@ class DesignerSubActionButton(ActionButton):
     def __init__(self, **kwargs):
         super(DesignerSubActionButton, self).__init__(**kwargs)
 
+    def on_press(self):
+        if self.cont_menu:
+            self.cont_menu.dismiss()
+
+
 class DesignerActionButton(ActionButton):
     '''DesignerActionButton is a ActionButton to the ActionBar menu
     '''
