@@ -1,0 +1,27 @@
+---
+layout: post
+title:  "Mid-Term Summary"
+date:   2015-07-02
+---
+
+Hi!
+
+We are at the middle of the program, so let's get an overview of my proposal, what I've done, what I'll be doing in the second part of the project. I'll also post about my experience until now, good and bad aspects, and how I'll work to do a good job.
+
+### Project Development
+
+I'm really happy to be able to work with extra features not listed in my proposal. As long as I did a good advance in my proposal, I worked in some interesting and important improvements to Kivy Designer. In the second part of the program, I'll finish to code my proposal and try to add as many new features/bug fixes as possible.
+
+
+### Blockers 
+
+Unfortunately, my University has a different calendar this year, I'll have classes until August 31 ;/, so I'm really sad to not be able to work with full time in my project. Sometimes I need to divide my study/work time. As I wrote above, I'm really happy to have a good progress, but I'd love to be able to do even more.
+
+### Second period
+
+In this second period, I'll try to focus my development to be able to release a more stable version of Kivy Designer. Right now Kivy Designer is an alpha tool, and actually, Isn't a nice tool to use. But by the end of the project, my goal is to invert this point of view. To improve the stability project, I'd like to add Unit Tests and documentation to the project. 
+
+
+Thx,
+
+Aron Bordin.  
