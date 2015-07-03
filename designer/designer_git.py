@@ -1,6 +1,8 @@
 from git.exc import InvalidGitRepositoryError
+from kivy._event import EventDispatcher
+from kivy.core.window import Window
 from kivy.properties import BooleanProperty, StringProperty, ObjectProperty, \
-    Clock
+    Clock, ListProperty
 from kivy.uix.popup import Popup
 from pygments.lexers.diff import DiffLexer
 from designer.designer_content import DesignerTabbedPanelItem
@@ -11,11 +13,43 @@ from designer.uix.designer_action_items import DesignerActionSubMenu, \
         DesignerSubActionButton
 from git import Repo
 from designer.uix.py_code_input import PyScrollView
+from designer.uix.settings import SettingList, SettingListContent
+
+
+class FakeSettingList(EventDispatcher):
+    '''Fake Kivy Setting to use SettingList
+    '''
+
+    items = ListProperty([])
+    '''List with default visible items
+    :attr:`items` is a :class:`~kivy.properties.ListProperty` and defaults
+    to [].
+    '''
+
+    allow_custom = BooleanProperty(False)
+    '''Allow/disallow a custom item to the list
+    :attr:`allow_custom` is a :class:`~kivy.properties.BooleanProperty`
+    and defaults to False
+    '''
+
+    group = StringProperty(None)
+    '''CheckBox group name. If the CheckBox is in a Group,
+    it becomes a Radio button.
+    :attr:`group` is a :class:`~kivy.properties.StringProperty` and
+    defaults to ''
+    '''
+
+    desc = StringProperty(None, allownone=True)
+    '''Description of the setting, rendered on the line below the title.
+
+    :attr:`desc` is a :class:`~kivy.properties.StringProperty` and defaults to
+    None.
+    '''
 
 
 class DesignerGit(DesignerActionSubMenu):
 
-    is_repo =  BooleanProperty(False)
+    is_repo = BooleanProperty(False)
     '''Indicates if it's representing a valid git repository
     :data:`is_repo` is a :class:`~kivy.properties.BooleanProperty`, defaults
        to False.
@@ -121,6 +155,36 @@ class DesignerGit(DesignerActionSubMenu):
         '''Git select files from a list to add
         '''
         files = self.repo.untracked_files
+        if not files:
+            show_alert('Git Add', 'All files are already indexed by Git')
+            return
+
+        # create the popup
+        fake_setting = FakeSettingList()
+        fake_setting.allow_custom = False
+        fake_setting.items = files
+        fake_setting.desc = 'Select files to add to Git index'
+
+        content = SettingListContent(setting=fake_setting)
+        popup_width = min(0.95 * Window.width, 500)
+        popup_height = min(0.95 * Window.height, 500)
+        self._popup = popup = Popup(
+            content=content, title='Git - Add files', size_hint=(None, None),
+            size=(popup_width, popup_height), auto_dismiss=False)
+
+        content.bind(on_apply=self._perform_do_add,
+                     on_cancel=self._popup.dismiss)
+
+        content.show_items()
+        popup.open()
+
+    @ignore_proj_watcher
+    def _perform_do_add(self, instance, selected_files, *args):
+        '''Add the selected files to git index
+        '''
+        self.repo.index.add(selected_files)
+        show_message('%d file(s) added to Git index' % len(selected_files), 5)
+        self._popup.dismiss()
 
     def do_branches(self, *args):
         '''Shows a list of git branches and allow to change the current one
