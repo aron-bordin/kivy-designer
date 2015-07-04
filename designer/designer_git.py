@@ -144,7 +144,7 @@ class DesignerGit(DesignerActionSubMenu):
         '''
         message = input.get_user_input()
         if self.repo.is_dirty():
-            self.repo.index.commit(message)
+            self.repo.git.commit('-am', message)
             show_message('Commit: ' + message, 5)
         else:
             show_alert('Git Commit', 'There is nothing to commit')
@@ -189,7 +189,55 @@ class DesignerGit(DesignerActionSubMenu):
     def do_branches(self, *args):
         '''Shows a list of git branches and allow to change the current one
         '''
-        pass
+        branches = []
+        for b in self.repo.heads:
+            branches.append(b.name)
+
+        # create the popup
+        fake_setting = FakeSettingList()
+        fake_setting.allow_custom = True
+        fake_setting.items = branches
+        fake_setting.desc = 'Checkout to the selected branch. \n' \
+                'You can type a name to create a new branch'
+        fake_setting.group = 'git_branch'
+
+        content = SettingListContent(setting=fake_setting)
+        popup_width = min(0.95 * Window.width, 500)
+        popup_height = min(0.95 * Window.height, 500)
+        self._popup = popup = Popup(
+            content=content, title='Git - Branches', size_hint=(None, None),
+            size=(popup_width, popup_height), auto_dismiss=False)
+
+        content.bind(on_apply=self._perform_do_branches,
+                     on_cancel=self._popup.dismiss)
+
+        content.selected_items = [self.repo.active_branch.name]
+        content.show_items()
+
+        popup.open()
+
+    @ignore_proj_watcher
+    def _perform_do_branches(self, instance, branches, *args):
+        '''If the branch name exists, try to checkout. If a new name, create
+        the branch and checkout.
+        If the code has modification, shows an alert and stops
+        '''
+        self._popup.dismiss()
+
+        if self.repo.is_dirty():
+            show_alert('Git checkout', 'Please, commit your changes before '
+                                                    + 'switch branches.')
+            return
+
+        if not branches:
+            return
+
+        branch = branches[0]
+        if branch in self.repo.heads:
+            self.repo.heads[branch].checkout()
+        else:
+            self.repo.create_head(branch)
+            self.repo.heads[branch].checkout()
 
     def do_diff(self, *args):
         '''Open a CodeInput with git diff
