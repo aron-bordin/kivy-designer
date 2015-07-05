@@ -1,8 +1,10 @@
+import threading
 from git.exc import InvalidGitRepositoryError
 from kivy._event import EventDispatcher
 from kivy.core.window import Window
 from kivy.properties import BooleanProperty, StringProperty, ObjectProperty, \
-    Clock, ListProperty
+    Clock, ListProperty, partial
+from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from pygments.lexers.diff import DiffLexer
 from designer.designer_content import DesignerTabbedPanelItem
@@ -11,7 +13,7 @@ from designer.helper_functions import ignore_proj_watcher, show_alert, \
 from designer.input_dialog import InputDialog
 from designer.uix.designer_action_items import DesignerActionSubMenu, \
         DesignerSubActionButton
-from git import Repo
+from git import Repo, RemoteProgress, GitCommandError
 from designer.uix.py_code_input import PyScrollView
 from designer.uix.settings import SettingList, SettingListContent
 
@@ -45,6 +47,50 @@ class FakeSettingList(EventDispatcher):
     :attr:`desc` is a :class:`~kivy.properties.StringProperty` and defaults to
     None.
     '''
+
+
+class SshAgent(EventDispatcher):
+
+    valid = BooleanProperty(False)
+    '''If the ssh key is available to use
+    :attr:`valid` is a :class:`~kivy.properties.BoolenProperty` and defaults to
+    False
+    '''
+
+
+class GitRemoteProgress(RemoteProgress):
+
+    label = None
+    text = ''
+
+    def __init__(self):
+        super(GitRemoteProgress, self).__init__()
+        self.label = Label(text='')
+        self.label.padding = [10, 10]
+
+    def update(self, op_code, cur_count, max_count=None, message=''):
+        self.text = 'Progress: %.2f (%d of %d)\n%s' % (
+            cur_count / (max_count or 100.0),
+            cur_count,
+            (max_count or 100),
+            message.replace(',', '').strip()
+        )
+
+    def update_text(self, *args):
+        '''Update the label text
+        '''
+        self.label.text = self.text
+        self.label.texture_update()
+
+    def start(self):
+        '''Start the label updating in a separated thread
+        '''
+        Clock.schedule_interval(self.update_text, 0.2)
+
+    def stop(self):
+        '''Start the label updating in a separated thread
+        '''
+        Clock.unschedule(self.update_text)
 
 
 class DesignerGit(DesignerActionSubMenu):
@@ -107,10 +153,18 @@ class DesignerGit(DesignerActionSubMenu):
             btn_diff = DesignerSubActionButton(text='Diff')
             btn_diff.bind(on_press=self.do_diff)
 
+            btn_push = DesignerSubActionButton(text='Push')
+            btn_push.bind(on_press=self.do_push)
+
+            btn_pull = DesignerSubActionButton(text='Pull')
+            btn_pull.bind(on_press=self.do_pull)
+
             self.add_widget(btn_commit)
             self.add_widget(btn_add)
             self.add_widget(btn_branches)
             self.add_widget(btn_diff)
+            self.add_widget(btn_push)
+            self.add_widget(btn_pull)
         else:
             btn_init = DesignerSubActionButton(text='Init repo')
             btn_init.bind(on_press=self.do_init)
@@ -121,11 +175,14 @@ class DesignerGit(DesignerActionSubMenu):
     def do_init(self, *args):
         '''Git init
         '''
-        self.repo = Repo.init(self.path, mkdir=False)
-        self.repo.index.commit('Init commit')
-        self.is_repo = True
-        self._update_menu()
-        show_message('Git repo initialized', 5)
+        try:
+            self.repo = Repo.init(self.path, mkdir=False)
+            self.repo.index.commit('Init commit')
+            self.is_repo = True
+            self._update_menu()
+            show_message('Git repo initialized', 5)
+        except:
+            show_alert('Git Init', 'Failted to initialize repo!')
 
     def do_commit(self, *args):
         '''Git commit
@@ -144,8 +201,11 @@ class DesignerGit(DesignerActionSubMenu):
         '''
         message = input.get_user_input()
         if self.repo.is_dirty():
-            self.repo.git.commit('-am', message)
-            show_message('Commit: ' + message, 5)
+            try:
+                self.repo.git.commit('-am', message)
+                show_message('Commit: ' + message, 5)
+            except GitCommandError as e:
+                show_alert('Git Commit', 'Failed to commit!\n' + str(e))
         else:
             show_alert('Git Commit', 'There is nothing to commit')
         self._popup.dismiss()
@@ -182,9 +242,13 @@ class DesignerGit(DesignerActionSubMenu):
     def _perform_do_add(self, instance, selected_files, *args):
         '''Add the selected files to git index
         '''
-        self.repo.index.add(selected_files)
-        show_message('%d file(s) added to Git index' % len(selected_files), 5)
-        self._popup.dismiss()
+        try:
+            self.repo.index.add(selected_files)
+            show_message('%d file(s) added to Git index' %
+                         len(selected_files), 5)
+            self._popup.dismiss()
+        except GitCommandError as e:
+            show_alert('Git Add', 'Failed to add files to Git!\n' + str(e))
 
     def do_branches(self, *args):
         '''Shows a list of git branches and allow to change the current one
@@ -233,11 +297,14 @@ class DesignerGit(DesignerActionSubMenu):
             return
 
         branch = branches[0]
-        if branch in self.repo.heads:
-            self.repo.heads[branch].checkout()
-        else:
-            self.repo.create_head(branch)
-            self.repo.heads[branch].checkout()
+        try:
+            if branch in self.repo.heads:
+                self.repo.heads[branch].checkout()
+            else:
+                self.repo.create_head(branch)
+                self.repo.heads[branch].checkout()
+        except GitCommandError as e:
+            show_alert('Git Branches', 'Failed to switch branch!\n' + str(e))
 
     def do_diff(self, *args):
         '''Open a CodeInput with git diff
@@ -272,3 +339,138 @@ class DesignerGit(DesignerActionSubMenu):
             self.diff_code_input.content.code_input.text = diff
         tabs.add_widget(self.diff_code_input)
         tabs.switch_to(tabs.tab_list[0])
+
+    def do_push(self, *args):
+        '''Open a list of remotes to push repository data.
+        If there is not remote, shows an alert
+        '''
+        remotes = []
+        for r in self.repo.remotes:
+            remotes.append(r.name)
+        if not remotes:
+            show_alert('Git Push Remote', 'There is no git remote configured!')
+            return
+
+        # create the popup
+        fake_setting = FakeSettingList()
+        fake_setting.allow_custom = False
+        fake_setting.items = remotes
+        fake_setting.desc = 'Push data to the selected remote'
+        fake_setting.group = 'git_remote'
+
+        content = SettingListContent(setting=fake_setting)
+        popup_width = min(0.95 * Window.width, 500)
+        popup_height = min(0.95 * Window.height, 500)
+        self._popup = popup = Popup(
+            content=content, title='Git - Push Remote', size_hint=(None, None),
+            size=(popup_width, popup_height), auto_dismiss=False)
+
+        content.bind(on_apply=self._perform_do_push,
+                     on_cancel=self._popup.dismiss)
+
+        content.selected_items = [remotes[0]]
+        content.show_items()
+
+        popup.open()
+
+    def _perform_do_push(self, instance, remotes, *args):
+        '''Try to perform a push
+        '''
+        remote = remotes[0]
+        remote_repo = self.repo.remotes[remote]
+        progress = GitRemoteProgress()
+
+        status = Popup(title='Git push progress',
+                            content=progress.label,
+                            size_hint=(None, None),
+                            size=(500, 200))
+        status.open()
+
+        @ignore_proj_watcher
+        def push(*args):
+            '''Do a push in a separated thread
+            '''
+            try:
+                remote_repo.push(self.repo.active_branch.name,
+                                 progress=progress)
+
+                def set_progress_done(*args):
+                    progress.label.text = 'Completed!'
+
+                Clock.schedule_once(set_progress_done, 1)
+                progress.stop()
+                show_message('Git remote push completed!', 5)
+            except GitCommandError as e:
+                progress.label.text = 'Failed to push!\n' + str(e)
+            self._popup.dismiss()
+
+        progress.start()
+        threading.Thread(target=push).start()
+
+    def do_pull(self, *args):
+        '''Open a list of remotes to pull remote data.
+        If there is not remote, shows an alert
+        '''
+        remotes = []
+        for r in self.repo.remotes:
+            remotes.append(r.name)
+        if not remotes:
+            show_alert('Git Pull Remote', 'There is no git remote configured!')
+            return
+
+        # create the popup
+        fake_setting = FakeSettingList()
+        fake_setting.allow_custom = False
+        fake_setting.items = remotes
+        fake_setting.desc = 'Pull data from the selected remote'
+        fake_setting.group = 'git_remote'
+
+        content = SettingListContent(setting=fake_setting)
+        popup_width = min(0.95 * Window.width, 500)
+        popup_height = min(0.95 * Window.height, 500)
+        self._popup = popup = Popup(
+            content=content, title='Git - Pull Remote', size_hint=(None, None),
+            size=(popup_width, popup_height), auto_dismiss=False)
+
+        content.bind(on_apply=self._perform_do_pull,
+                     on_cancel=self._popup.dismiss)
+
+        content.selected_items = [remotes[0]]
+        content.show_items()
+
+        popup.open()
+
+    def _perform_do_pull(self, instance, remotes, *args):
+        '''Try to perform a pull
+        '''
+        remote = remotes[0]
+        remote_repo = self.repo.remotes[remote]
+        progress = GitRemoteProgress()
+
+        status = Popup(title='Git pull progress',
+                            content=progress.label,
+                            size_hint=(None, None),
+                            size=(500, 200))
+        status.open()
+
+        @ignore_proj_watcher
+        def pull(*args):
+            '''Do a pull in a separated thread
+            '''
+            try:
+                s = remote_repo.pull(progress=progress)
+                for stage, _ in self.repo.index.iter_blobs():
+                    print(stage)
+
+                def set_progress_done(*args):
+                    progress.label.text = 'Completed!'
+
+                Clock.schedule_once(set_progress_done, 1)
+                progress.stop()
+                show_message('Git remote pull completed!', 5)
+            except GitCommandError as e:
+                progress.label.text = 'Failed to pull!\n' + str(e)
+            self._popup.dismiss()
+
+        progress.start()
+        threading.Thread(target=pull).start()
