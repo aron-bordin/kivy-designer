@@ -3,10 +3,12 @@ from git.exc import InvalidGitRepositoryError
 from kivy._event import EventDispatcher
 from kivy.core.window import Window
 from kivy.properties import BooleanProperty, StringProperty, ObjectProperty, \
-    Clock, ListProperty, partial
+    Clock, ListProperty
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
+import os
 from pygments.lexers.diff import DiffLexer
+import designer
 from designer.designer_content import DesignerTabbedPanelItem
 from designer.helper_functions import ignore_proj_watcher, show_alert, \
     show_message, get_designer
@@ -15,7 +17,7 @@ from designer.uix.designer_action_items import DesignerActionSubMenu, \
         DesignerSubActionButton
 from git import Repo, RemoteProgress, GitCommandError
 from designer.uix.py_code_input import PyScrollView
-from designer.uix.settings import SettingList, SettingListContent
+from designer.uix.settings import SettingListContent
 
 
 class FakeSettingList(EventDispatcher):
@@ -49,15 +51,6 @@ class FakeSettingList(EventDispatcher):
     '''
 
 
-class SshAgent(EventDispatcher):
-
-    valid = BooleanProperty(False)
-    '''If the ssh key is available to use
-    :attr:`valid` is a :class:`~kivy.properties.BoolenProperty` and defaults to
-    False
-    '''
-
-
 class GitRemoteProgress(RemoteProgress):
 
     label = None
@@ -79,8 +72,8 @@ class GitRemoteProgress(RemoteProgress):
     def update_text(self, *args):
         '''Update the label text
         '''
-        self.label.text = self.text
-        self.label.texture_update()
+        if self.text:
+            self.label.text = self.text
 
     def start(self):
         '''Start the label updating in a separated thread
@@ -95,6 +88,7 @@ class GitRemoteProgress(RemoteProgress):
 
 class DesignerGit(DesignerActionSubMenu):
 
+    ## TODO implement non-Unix OS version
     is_repo = BooleanProperty(False)
     '''Indicates if it's representing a valid git repository
     :data:`is_repo` is a :class:`~kivy.properties.BooleanProperty`, defaults
@@ -130,6 +124,11 @@ class DesignerGit(DesignerActionSubMenu):
         try:
             self.repo = Repo(path)
             self.is_repo = True
+
+            _dir = os.path.dirname(designer.__file__)
+            _dir = os.path.split(_dir)[0]
+            script = os.path.join(_dir, 'tools', 'ssh-agent', 'ssh.sh')
+            self.repo.git.update_environment(GIT_SSH_COMMAND=script)
         except InvalidGitRepositoryError:
             self.is_repo = False
         self._update_menu()
@@ -458,9 +457,7 @@ class DesignerGit(DesignerActionSubMenu):
             '''Do a pull in a separated thread
             '''
             try:
-                s = remote_repo.pull(progress=progress)
-                for stage, _ in self.repo.index.iter_blobs():
-                    print(stage)
+                remote_repo.pull(progress=progress)
 
                 def set_progress_done(*args):
                     progress.label.text = 'Completed!'

@@ -56,7 +56,7 @@ from designer.eventviewer import EventViewer
 from designer.uix.designer_action_items import DesignerActionButton, \
     DesignerActionProfileCheck
 from designer.help_dialog import HelpDialog, AboutDialog
-from designer.designer_git import  DesignerGit
+from designer.designer_git import DesignerGit
 
 NEW_PROJECT_DIR_NAME = 'new_proj'
 NEW_TEMPLATES_DIR = 'new_templates'
