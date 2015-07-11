@@ -302,7 +302,7 @@ class Desktop(Builder):
 
         self.can_run = True
 
-    def run(self):
+    def run(self, module='screen'):
         '''Run the project using Python
         '''
         self._get_python()
@@ -315,8 +315,32 @@ class Desktop(Builder):
             self.profiler.dispatch('on_error', 'Cannot find main.py')
             return
 
-        self.run_command(
-                    '%s %s %s' % (self.python_path, py_main, self.args))
+        # makes screen module as default. always check it
+        if module == 'screen':
+            orientation = ''
+            if self.designer.ids.screen_orientation_portrait.checkbox.active:
+                orientation = 'portrait'
+            else:
+                orientation = 'landscape'
+
+            device = ''
+            for s in self.designer.select_screen_emulation._list_children:
+                screen = s[0]
+                if screen.checkbox.active:
+                    device = screen.config_key
+                    break
+
+            # not using the screen module
+            if device == '0_disabled':
+                self.run_command(
+                        '%s %s %s' % (self.python_path, py_main, self.args))
+
+            else:
+                self.run_command(
+                    '%s %s -m screen:%s,%s %s' % (self.python_path, py_main,
+                                                  device, orientation,
+                                                  self.args)
+                )
         self.ui_creator.tab_pannel.switch_to(
             self.ui_creator.tab_pannel.tab_list[2])
 

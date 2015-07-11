@@ -66,6 +66,7 @@ class ActionCheckButton(ActionItem, BoxLayout):
         self._label.text_size = (self.minimum_width - self.checkbox.width - 4,
                                  self._label.size[1])
         self.checkbox.active = self.checkbox_active
+        self.checkbox.group = self.group
 
     def on_touch_down(self, touch):
         '''Override of its parent's on_touch_down, used to reverse the state

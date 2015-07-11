@@ -52,7 +52,7 @@ from designer.helper_functions import get_kivy_designer_dir, show_alert
 from designer.new_dialog import NewProjectDialog, NEW_PROJECTS
 from designer.eventviewer import EventViewer
 from designer.uix.designer_action_items import DesignerActionButton, \
-    DesignerActionProfileCheck
+    DesignerActionProfileCheck, DesignerActionSubMenu
 from designer.help_dialog import HelpDialog, AboutDialog
 
 NEW_PROJECT_DIR_NAME = 'new_proj'
@@ -145,7 +145,15 @@ class Designer(FloatLayout):
     select_profile_cont_menu = ObjectProperty(None)
     '''Reference of
         :class:`~designer.uix.designer_action_items.DesignerActionSubMenu`.
-       :data:`start_page` is a :class:`~kivy.properties.ObjectProperty`
+       :data:`select_profile_cont_menu` is a
+       :class:`~kivy.properties.ObjectProperty`
+    '''
+
+    select_screen_emulation = ObjectProperty(None)
+    '''Reference of
+        :class:`~designer.uix.designer_action_items.DesignerActionSubMenu`.
+       :data:`select_screen_emulation` is a
+       :class:`~kivy.properties.ObjectProperty`
     '''
 
     selected_profile = StringProperty('')
@@ -1007,29 +1015,59 @@ class Designer(FloatLayout):
             btn.text = prof_name
             btn.checkbox.active = False
 
+            btn.config_key = profile
+            btn.bind(on_active=self._perform_profile_selected)
+
             if self.designer_settings.config_parser.getdefault('internal',
                                         'default_profile', '') == config_path:
                 btn.checkbox.active = True
                 self.selected_profile = config_path
+                self._perform_profile_selected(btn, btn.checkbox, True)
 
-            btn.config_key = profile
-            btn.bind(on_active=self._perform_profile_selected)
             prof_menu.add_widget(btn)
 
         prof_menu._add_widget()
 
-    def _perform_profile_selected(self, *args):
+    def fill_select_screen_menu(self, *args):
+        screens = self.select_screen_emulation
+        screens.remove_children()
+        group = 'screen_emulation'
+
+        from kivy.modules import screen
+        devices = screen.devices
+        devices['0_disabled'] = ('Disabled', )
+
+        for device in sorted(devices):
+            btn = DesignerActionProfileCheck(group=group,
+                                             allow_no_selection=False,
+                                             config_key=device)
+            btn.text = devices[device][0]
+            btn.checkbox.active = True if device == '0_disabled' else False
+            screens.add_widget(btn)
+
+        screens._add_widget()
+
+    def _perform_profile_selected(self, instance, checkbox, value, *args):
         '''Event handler to select profile radio button.
         Save the selected config_parser path to the config
         '''
-        if args[2]:
-            _config = self.prof_settings.config_parsers[args[0].config_key]
+        if value:
+            _config = self.prof_settings.config_parsers[instance.config_key]
             _config_path = _config.filename
             self.designer_settings.config_parser.set('internal',
                                                      'default_profile',
                                                      _config_path)
             self.designer_settings.config_parser.write()
             self.selected_profile = _config_path
+
+            target = _config.getdefault('profile', 'target', '')
+
+            if target == 'Desktop':
+                self.ids.select_screen_orientation.disabled = False
+                self.ids.select_screen_emulation.disabled = False
+            else:
+                self.ids.select_screen_orientation.disabled = True
+                self.ids.select_screen_emulation.disabled = True
 
     def action_btn_recent_files_pressed(self, *args):
         '''Event Handler when ActionButton "Recent Projects" is pressed.
@@ -1669,6 +1707,7 @@ class DesignerApp(App):
             self.root.recent_manager.list_files)
 
         self.root.fill_select_profile_menu()
+        self.root.fill_select_screen_menu()
 
     def create_kivy_designer_dir(self):
         '''To create the ~/.kivy-designer dir

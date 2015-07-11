@@ -240,7 +240,6 @@
 
 <MenuButton>:
     background_normal: 'atlas://data/images/defaulttheme/action_item'
-    background_disabled_normal: 'atlas://data/images/defaulttheme/action_item'
     background_down: 'atlas://data/images/defaulttheme/action_item_down'
     background_disabled_down: 'atlas://data/images/defaulttheme/action_item_down'
 
@@ -1092,6 +1091,7 @@
     actionbar: actionbar
     start_page: start_page.__self__
     select_profile_cont_menu: select_profile_cont_menu
+    select_screen_emulation: select_screen_emulation
 
     ActionBar:
         id: actionbar
@@ -1218,6 +1218,22 @@
                     id: actn_btn_run_proj
                     text: 'Run'
                     on_release: root.action_btn_run_project_pressed()
+                DesignerActionSubMenu:
+                    id: select_screen_emulation
+                    text: 'Screen Emulation'
+                DesignerActionSubMenu:
+                    id: select_screen_orientation
+                    text: 'Screen Orientation'
+                    DesignerActionProfileCheck:
+                        id: screen_orientation_portrait
+                        text: 'Portrait'
+                        group: 'screen_orientation'
+                    DesignerActionProfileCheck:
+                        id: screen_orientation_landscape
+                        text: 'Landscape'
+                        group: 'screen_orientation'
+                        checkbox_active: False
+
                 DesignerActionButton:
                     id: actn_btn_stop_proj
                     disabled: True
