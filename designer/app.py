@@ -2,6 +2,7 @@ import webbrowser
 from designer.input_dialog import InputDialog
 from designer.profile_settings import ProfileSettings
 from designer.profiler import Profiler
+from designer.uix.modules_contview import ModulesContView
 
 __all__ = ('DesignerApp', )
 
@@ -35,6 +36,7 @@ from designer.uix.actioncheckbutton import ActionCheckButton
 from designer.playground import PlaygroundDragElement
 from designer.common import widgets
 from designer.uix.editcontview import EditContView
+from designer.uix.modules_contview import ModulesContView
 from designer.uix.kv_lang_area import KVLangArea
 from designer.undo_manager import WidgetOperation, UndoManager
 from designer.project_loader import ProjectLoader, ProjectLoaderException
@@ -75,7 +77,12 @@ class Designer(FloatLayout):
 
     editcontview = ObjectProperty(None)
     '''Reference to the :class:`~designer.uix.EditContView` instance.
-       :data:`v` is a :class:`~kivy.properties.ObjectProperty`
+       :data:`editcontview` is a :class:`~kivy.properties.ObjectProperty`
+    '''
+
+    modulescontview = ObjectProperty(None)
+    '''Reference to the :class:`~designer.uix.modules_contview.ModulesContView`.
+       :data:`modulescontview` is a :class:`~kivy.properties.ObjectProperty`
     '''
 
     actionbar = ObjectProperty(None)
@@ -146,13 +153,6 @@ class Designer(FloatLayout):
     '''Reference of
         :class:`~designer.uix.designer_action_items.DesignerActionSubMenu`.
        :data:`select_profile_cont_menu` is a
-       :class:`~kivy.properties.ObjectProperty`
-    '''
-
-    select_screen_emulation = ObjectProperty(None)
-    '''Reference of
-        :class:`~designer.uix.designer_action_items.DesignerActionSubMenu`.
-       :data:`select_screen_emulation` is a
        :class:`~kivy.properties.ObjectProperty`
     '''
 
@@ -1028,25 +1028,6 @@ class Designer(FloatLayout):
 
         prof_menu._add_widget()
 
-    def fill_select_screen_menu(self, *args):
-        screens = self.select_screen_emulation
-        screens.remove_children()
-        group = 'screen_emulation'
-
-        from kivy.modules import screen
-        devices = screen.devices
-        devices['0_disabled'] = ('Disabled', )
-
-        for device in sorted(devices):
-            btn = DesignerActionProfileCheck(group=group,
-                                             allow_no_selection=False,
-                                             config_key=device)
-            btn.text = devices[device][0]
-            btn.checkbox.active = True if device == '0_disabled' else False
-            screens.add_widget(btn)
-
-        screens._add_widget()
-
     def _perform_profile_selected(self, instance, checkbox, value, *args):
         '''Event handler to select profile radio button.
         Save the selected config_parser path to the config
@@ -1063,11 +1044,9 @@ class Designer(FloatLayout):
             target = _config.getdefault('profile', 'target', '')
 
             if target == 'Desktop':
-                self.ids.select_screen_orientation.disabled = False
-                self.ids.select_screen_emulation.disabled = False
+                self.ids.actn_btn_run_module.disabled = False
             else:
-                self.ids.select_screen_orientation.disabled = True
-                self.ids.select_screen_emulation.disabled = True
+                self.ids.actn_btn_run_module.disabled = True
 
     def action_btn_recent_files_pressed(self, *args):
         '''Event Handler when ActionButton "Recent Projects" is pressed.
@@ -1458,6 +1437,15 @@ class Designer(FloatLayout):
 
         self._popup.open()
 
+    def action_btn_run_module_pressed(self, *args):
+
+        if self.modulescontview is None:
+            self.modulescontview = ModulesContView()
+            self.modulescontview.bind(
+                on_module=self.action_btn_run_project_pressed)
+
+        self.actionbar.add_widget(self.modulescontview)
+
     def action_btn_project_settings_pressed(self, *args):
         '''Event Handler when ActionButton "Project Settings" is pressed.
         '''
@@ -1497,46 +1485,6 @@ class Designer(FloatLayout):
                                    self.project_loader.proj_dir)
         return True
 
-    def action_btn_run_project_pressed(self, *args):
-        '''Event Handler when ActionButton "Run" is pressed.
-        '''
-        if self.project_loader.file_list == []:
-            return
-        args = ''
-        envs = ''
-
-        python_path = self.designer_settings.config_parser.getdefault(
-            'global', 'python_shell_path', '')
-
-        if python_path == '':
-            self.statusbar.show_message("Python Shell Path not specified,"
-                                        " please specify it before running"
-                                        " project")
-            return
-
-        if self.proj_settings and self.proj_settings.config_parser:
-            args = self.proj_settings.config_parser.getdefault('arguments',
-                                                               'arg', '')
-            envs = self.proj_settings.config_parser.getdefault(
-                'env variables', 'env', '')
-            for env in envs.split(' '):
-                self.ui_creator.kivy_console.environment[
-                    env[:env.find('=')]] = env[env.find('=') + 1:]
-
-        for _file in self.project_loader.file_list:
-            if 'main.py' in os.path.basename(_file):
-                self.ui_creator.kivy_console.stdin.write(
-                    '"%s" "%s" %s' % (python_path, _file, args))
-                self.ui_creator.tab_pannel.switch_to(
-                    self.ui_creator.tab_pannel.tab_list[2])
-                return
-
-        self.ui_creator.kivy_console.stdin.write(
-            '"%s" "%s" %s' % (python_path, self.project_loader._app_file, args))
-
-        self.ui_creator.tab_pannel.switch_to(
-            self.ui_creator.tab_pannel.tab_list[2])
-
     def action_btn_stop_project_pressed(self, *args):
         '''Event handler when ActionButton "Stop" is pressed.
         '''
@@ -1565,7 +1513,7 @@ class Designer(FloatLayout):
             return
         self.profiler.rebuild()
 
-    def action_btn_run_project_pressed(self, *args):
+    def action_btn_run_project_pressed(self, *args, **kwargs):
         '''Event Handler when ActionButton "Run" is pressed.
         '''
         if not self.check_selected_prof():
@@ -1573,7 +1521,7 @@ class Designer(FloatLayout):
         if self.project_loader.file_list == []:
             return
 
-        self.profiler.run()
+        self.profiler.run(*args, **kwargs)
 
     def on_sandbox_getting_exception(self, *args):
         '''Event Handler for
@@ -1707,7 +1655,6 @@ class DesignerApp(App):
             self.root.recent_manager.list_files)
 
         self.root.fill_select_profile_menu()
-        self.root.fill_select_screen_menu()
 
     def create_kivy_designer_dir(self):
         '''To create the ~/.kivy-designer dir

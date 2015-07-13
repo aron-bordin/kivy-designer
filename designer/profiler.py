@@ -147,8 +147,7 @@ class Buildozer(Builder):
                                'Updating project dependencies...')
         self.ui_creator.kivy_console.bind(on_command_list_done=self.build)
 
-
-    def run(self, *args):
+    def run(self, *args, **kwargs):
         '''Run the build command and then run the application on the device
         '''
         self.build()
@@ -302,9 +301,12 @@ class Desktop(Builder):
 
         self.can_run = True
 
-    def run(self, module='screen'):
+    def run(self, *args, **kwargs):
         '''Run the project using Python
         '''
+        mod = kwargs.get('mod', '')
+        data = kwargs.get('data', [])
+
         self._get_python()
         if not self.can_run:
             return
@@ -315,32 +317,18 @@ class Desktop(Builder):
             self.profiler.dispatch('on_error', 'Cannot find main.py')
             return
 
-        # makes screen module as default. always check it
-        if module == 'screen':
-            orientation = ''
-            if self.designer.ids.screen_orientation_portrait.checkbox.active:
-                orientation = 'portrait'
-            else:
-                orientation = 'landscape'
+        cmd = ''
+        if mod == '':
+            cmd = '%s %s %s' % (self.python_path, py_main, self.args)
+        elif mod == 'screen':
+            cmd = '%s %s -m screen:%s %s' % (self.python_path, py_main,
+                                             data, self.args)
+        else:
+            cmd = '%s %s -m %s %s' % (self.python_path, py_main,
+                                      mod, self.args)
 
-            device = ''
-            for s in self.designer.select_screen_emulation._list_children:
-                screen = s[0]
-                if screen.checkbox.active:
-                    device = screen.config_key
-                    break
+        self.run_command(cmd)
 
-            # not using the screen module
-            if device == '0_disabled':
-                self.run_command(
-                        '%s %s %s' % (self.python_path, py_main, self.args))
-
-            else:
-                self.run_command(
-                    '%s %s -m screen:%s,%s %s' % (self.python_path, py_main,
-                                                  device, orientation,
-                                                  self.args)
-                )
         self.ui_creator.tab_pannel.switch_to(
             self.ui_creator.tab_pannel.tab_list[2])
 
@@ -486,10 +474,10 @@ class Profiler(EventDispatcher):
         super(Profiler, self).__init__(**kwargs)
         self.profile_config = ConfigParser(name='profiler')
 
-    def run(self):
+    def run(self, *args, **kwargs):
         '''Run project
         '''
-        self.builder.run()
+        self.builder.run(*args, **kwargs)
 
     def stop(self):
         '''Stop project

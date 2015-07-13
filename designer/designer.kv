@@ -576,6 +576,97 @@
             pos: self.pos
             size: self.size
             source: self.background_normal
+<DesignerActionGroup>:
+    mode: 'spinner'
+    size_hint_x: None
+    dropdown_cls: ContextMenu
+
+<ModScreenContView>:
+    ActionPrevious:
+        title: "Screen"
+        width: 100
+        with_previous: True
+    ActionOverflow:
+    ActionButton:
+        text: 'Run'
+        on_release: root.on_run_press()
+    DesignerActionGroup:
+        id: module_screen_device
+        text: 'Device'
+    DesignerActionGroup:
+        id: module_screen_orientation
+        text: 'Orientation'
+        DesignerActionProfileCheck:
+            text: 'Portrait'
+            group: 'screen_orientation'
+            allow_no_selection: False
+            config_key: 'portrait'
+        DesignerActionProfileCheck:
+            text: 'Landscape'
+            group: 'screen_orientation'
+            allow_no_selection: False
+            checkbox_active: False
+            config_key: 'landscape'
+    DesignerActionGroup:
+        id: module_screen_scale
+        text: 'Scale'
+        DesignerActionProfileCheck:
+            id: module_screen_25
+            text: '25%'
+            group: 'screen_scale'
+            allow_no_selection: False
+            checkbox_active: False
+            config_key: '0.25'
+        DesignerActionProfileCheck:
+            id: module_screen_50
+            text: '50%'
+            group: 'screen_scale'
+            allow_no_selection: False
+            checkbox_active: False
+            config_key: '0.50'
+        DesignerActionProfileCheck:
+            id: module_screen_100
+            text: '100%'
+            group: 'screen_scale'
+            allow_no_selection: False
+            checkbox_active: True
+            config_key: '1.0'
+        DesignerActionProfileCheck:
+            id: module_screen_150
+            text: '150%'
+            group: 'screen_scale'
+            allow_no_selection: False
+            checkbox_active: False
+            config_key: '1.5'
+        DesignerActionProfileCheck:
+            id: module_screen_200
+            text: '200%'
+            group: 'screen_scale'
+            allow_no_selection: False
+            checkbox_active: False
+            config_key: '2.0'
+
+<ModulesContView>:
+    ActionPrevious:
+        title: "Modules"
+        width: 100
+        with_previous: True
+    ActionOverflow:
+    ActionButton:
+        text: 'Screen Emulation'
+        on_release: root.on_screen()
+    ActionButton:
+        text: 'Touchring'
+        on_release: root.dispatch('on_module', mod='touchring', data=[])
+    ActionButton:
+        text: 'Monitor'
+        on_release: root.dispatch('on_module', mod='monitor', data=[])
+    ActionButton:
+        text: 'Inspector'
+        on_release: root.dispatch('on_module', mod='inspector', data=[])
+    ActionButton:
+        text: 'Web Debugger'
+        on_release: root.on_webdebugger(self)
 
 <EditContView>:
     ActionPrevious:
@@ -1091,7 +1182,6 @@
     actionbar: actionbar
     start_page: start_page.__self__
     select_profile_cont_menu: select_profile_cont_menu
-    select_screen_emulation: select_screen_emulation
 
     ActionBar:
         id: actionbar
@@ -1105,9 +1195,6 @@
             DesignerActionGroup:
                 id: actn_menu_file
                 text: 'File'
-                mode: 'spinner'
-                size_hint_x: None
-                dropdown_cls: ContextMenu
                 DesignerActionButton:
                     id: actn_btn_new_file
                     text: 'New File'
@@ -1148,10 +1235,6 @@
             DesignerActionGroup:
                 id: actn_menu_view
                 text: 'View'
-                mode: 'spinner'
-                size_hint_x: None
-                width: 90
-                dropdown_cls: ContextMenu
                 disabled: True
                 ActionCheckButton:
                     id: actn_chk_proj_tree
@@ -1186,10 +1269,6 @@
             DesignerActionGroup:
                 id: actn_menu_proj
                 text: 'Project'
-                mode: 'spinner'
-                size_hint_x: None
-                width: 90
-                dropdown_cls: ContextMenu
                 disabled: True
                 DesignerActionButton:
                     id: actn_btn_add_file
@@ -1209,31 +1288,15 @@
             DesignerActionGroup:
                 id: actn_menu_run
                 text: 'Run'
-                mode: 'spinner'
-                size_hint_x: None
-                width: 90
-                dropdown_cls: ContextMenu
                 disabled: True
                 DesignerActionButton:
                     id: actn_btn_run_proj
                     text: 'Run'
                     on_release: root.action_btn_run_project_pressed()
-                DesignerActionSubMenu:
-                    id: select_screen_emulation
-                    text: 'Screen Emulation'
-                DesignerActionSubMenu:
-                    id: select_screen_orientation
-                    text: 'Screen Orientation'
-                    DesignerActionProfileCheck:
-                        id: screen_orientation_portrait
-                        text: 'Portrait'
-                        group: 'screen_orientation'
-                    DesignerActionProfileCheck:
-                        id: screen_orientation_landscape
-                        text: 'Landscape'
-                        group: 'screen_orientation'
-                        checkbox_active: False
-
+                DesignerActionButton:
+                    id: actn_btn_run_module
+                    text: 'Run with module...'
+                    on_release: root.action_btn_run_module_pressed()
                 DesignerActionButton:
                     id: actn_btn_stop_proj
                     disabled: True
@@ -1263,10 +1326,6 @@
             DesignerActionGroup:
                 id: actn_menu_help
                 text: 'Help'
-                mode: 'spinner'
-                size_hint_x: None
-                width: 90
-                dropdown_cls: ContextMenu
                 DesignerActionButton:
                     id: actn_btn_help
                     text: 'Help'
