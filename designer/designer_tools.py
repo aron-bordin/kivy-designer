@@ -145,3 +145,27 @@ class DesignerTools(EventDispatcher):
 
         content.bind(on_create=on_create)
         self._popup.open()
+
+    @ignore_proj_watcher
+    def create_gitignore(self):
+        '''Create .gitignore
+        '''
+        proj_loader = self.designer.project_loader
+        proj_dir = proj_loader.proj_dir
+        status = self.designer.statusbar
+
+        gitignore_path = os.path.join(proj_dir, '.gitignore')
+
+        if os.path.exists(gitignore_path):
+            show_alert('Create .gitignore', '.gitignore already exists!')
+            return False
+
+        gitignore = '''*.pyc
+*.pyo
+bin/
+.designer/
+.buildozer/
+__pycache__/'''
+
+        f = open(gitignore_path, 'w').write(gitignore)
+        status.show_message('.gitignore created successfully', 5)
