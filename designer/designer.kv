@@ -598,53 +598,61 @@
         text: 'Orientation'
         DesignerActionProfileCheck:
             text: 'Portrait'
-            group: 'screen_orientation'
+            group: 'mod_screen_orientation'
             allow_no_selection: False
+            checkbox_active: False
             config_key: 'portrait'
+            on_active: root.on_module_settings(self)
         DesignerActionProfileCheck:
             text: 'Landscape'
-            group: 'screen_orientation'
+            group: 'mod_screen_orientation'
             allow_no_selection: False
             checkbox_active: False
             config_key: 'landscape'
+            on_active: root.on_module_settings(self)
     DesignerActionGroup:
         id: module_screen_scale
         text: 'Scale'
         DesignerActionProfileCheck:
             id: module_screen_25
             text: '25%'
-            group: 'screen_scale'
+            group: 'mod_screen_scale'
             allow_no_selection: False
             checkbox_active: False
             config_key: '0.25'
+            on_active: root.on_module_settings(self)
         DesignerActionProfileCheck:
             id: module_screen_50
             text: '50%'
-            group: 'screen_scale'
+            group: 'mod_screen_scale'
             allow_no_selection: False
             checkbox_active: False
             config_key: '0.50'
+            on_active: root.on_module_settings(self)
         DesignerActionProfileCheck:
             id: module_screen_100
             text: '100%'
-            group: 'screen_scale'
+            group: 'mod_screen_scale'
             allow_no_selection: False
-            checkbox_active: True
+            checkbox_active: False
             config_key: '1.0'
+            on_active: root.on_module_settings(self)
         DesignerActionProfileCheck:
             id: module_screen_150
             text: '150%'
-            group: 'screen_scale'
+            group: 'mod_screen_scale'
             allow_no_selection: False
             checkbox_active: False
             config_key: '1.5'
+            on_active: root.on_module_settings(self)
         DesignerActionProfileCheck:
             id: module_screen_200
             text: '200%'
-            group: 'screen_scale'
+            group: 'mod_screen_scale'
             allow_no_selection: False
             checkbox_active: False
             config_key: '2.0'
+            on_active: root.on_module_settings(self)
 
 <ModulesContView>:
     ActionPrevious:
