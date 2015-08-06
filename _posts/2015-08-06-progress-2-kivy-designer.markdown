@@ -7,7 +7,7 @@ date:   2015-08-06
 
 Hi!
 
-I have in my proposal and extra items, and as we are getting closer to the end of the project, let's see how it's going, and my next steps until the end.
+I have advanced in my proposal and extra items, and as we are getting closer to the end of the project, let's see how it's going, and my next steps until the end.
 
 ### Usual Python/Garden modules on Buildozer spec editor
 
