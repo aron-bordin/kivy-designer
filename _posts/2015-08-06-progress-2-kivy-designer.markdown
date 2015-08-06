@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Progress Report"
+title:  "Progress Report 2"
 date:   2015-08-06
 ---
 
