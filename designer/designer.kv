@@ -344,10 +344,34 @@
     valign: 'middle'
 
 <DesignerActionButton>:
-    text_size: (self.width - sp(24), self.size[1])
-    valign: 'middle'
-    size_hint_y: None
-    height: '40sp'
+    info: info
+    background_normal: 'atlas://data/images/defaulttheme/action_bar'
+
+    canvas.before:
+        Color:
+            rgba: [1, 1, 1, .5] if self.disabled else [1, 1, 1, 1]
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: self.background_normal
+    Label:
+        pos: root.pos
+        text_size: (self.width - sp(24), self.size[1])
+        valign: 'middle'
+        size_hint_y: None
+        height: '40sp'
+        text: root.text
+    Label:
+        id: info
+        text: root.desc
+        pos: root.pos
+        size: root.size
+        opacity: 0.3
+        text_size: self.size
+        valign: 'bottom'
+        halign: 'right'
+        padding: 5, 5
+
 
 <DesignerActionSubMenu>:
     text_size: (self.width - sp(24), self.size[1])
@@ -382,12 +406,22 @@
 <PyScrollView>:
     id: scroll
     code_input: code_input
-    PyCodeInput:
-        id: code_input
-        font_name: 'data/fonts/DroidSansMono.ttf'
-        auto_indent: True
-        size_hint_y: None
+    line_number: line_number
+    GridLayout:
+        cols: 2
+        size_hint: 1, None
         height: max(scroll.height, self.minimum_height)
+        TextInput:
+            id: line_number
+            size_hint: None, 1
+            readonly: True
+            background_color: 1, 1, 1, 0
+            foreground_color: 1, 1, 1, 1
+        PyCodeInput:
+            id: code_input
+            auto_indent: True
+            size_hint_y: None
+            height: max(self.minimum_height, scroll.height)
 
 <AddFileDialog>:
     text_file: text_file
@@ -565,11 +599,15 @@
         Button:
             text: 'No'
             on_press: root.dispatch('on_cancel')
-    
+
 <ActionCheckButton>:
-    orientation: 'horizontal'
+    btn_layout: btn_layout
+    _label: _label
+    checkbox: checkbox
     background_normal: 'atlas://data/images/defaulttheme/action_bar'
     minimum_width: 200
+    size_hint_y: None
+    height: sp(50)
     canvas.before:
         Color:
             rgba: 1,1,1,1
@@ -577,6 +615,36 @@
             pos: self.pos
             size: self.size
             source: self.background_normal
+    BoxLayout:
+        id: btn_layout
+        pos: root.pos
+        padding: 5, 0, 5, 0
+        spacing: 10
+        CheckBox:
+            id: checkbox
+            size_hint_x: None
+            width: '20sp'
+            pos: root.x + 2, root.y
+            active: True
+            group: root.group
+            allow_no_selection: root.allow_no_selection
+            on_active: root.dispatch('on_active', *args)
+        Label:
+            id: _label
+            text_size: self.size
+            valign: 'middle'
+            text: root.text
+    Label:
+        id: info
+        text: root.desc
+        pos: root.pos
+        size: root.size
+        opacity: 0.3
+        text_size: self.size
+        valign: 'bottom'
+        halign: 'right'
+        padding: 5, 5
+
 
 #
 # Buildozer Spec Editor
@@ -773,7 +841,8 @@
 <StatusBar>:
     app: app
     navbar: navbar
-    gridlayout: gridlayout
+    status_message: status_message
+    status_info: status_info
     canvas:
         Color:
             rgb: bordercolor
@@ -786,12 +855,51 @@
             pos: self.pos
             size: self.size
 
-    GridLayout:
-        id: gridlayout
-        rows: 1
-        GridLayout:
-            rows: 1
+    ScrollView:
+        id: nav_scroll
+        size_hint_x: None
+        width: 0
+        do_scroll_y: False
+        StatusNavbar:
             id: navbar
+            size_hint_x: None
+            width: max(nav_scroll.width, self.width)
+            on_children: root._update_content_width()
+
+    StatusMessage:
+        id: status_message
+        size_hint: 0.9, None
+        height: '20pt'
+        spacing: 10
+        on_message: root._update_content_width()
+        on_touch_down: if self.collide_point(*args[1].pos): root.dispatch('on_message_press')
+        Image:
+            size_hint: None, None
+            width: '20pt'
+            height: '20pt'
+            source: status_message.icon
+            opacity: 0 if not status_message.icon else 1
+        Label:
+            size_hint_x: 1
+            text: status_message.message
+            text_size: self.size
+            halign: 'left'
+            valign: 'middle'
+            shorten: True
+            shorten_from: 'left'
+
+    StatusInfo:
+        id: status_info
+        size_hint_x: 0.1
+        on_touch_down: if self.collide_point(*args[1].pos): root.dispatch('on_info_press')
+        Label:
+            size_hint_x: 1
+            text: status_info.message
+            text_size: self.size
+            halign: 'center'
+            valign: 'middle'
+            shorten: True
+            shorten_from: 'left'
 
 <StatusNavBarButton>:
     text: getattr(root.node, '__class__').__name__
@@ -973,14 +1081,25 @@
                         text: 'KV Lang Area'
                         BoxLayout:
                             orientation: 'vertical'
-                            ScrollView:
+                            KVLangAreaScroll:
                                 id: scroll
-                                KVLangArea:
-                                    id: code_input
-                                    size_hint_y: None
+                                kv_lang_area: code_input
+                                line_number: line_number
+                                GridLayout:
+                                    cols: 2
+                                    size_hint: 1, None
                                     height: max(scroll.height, self.minimum_height)
-                                    on_show_edit: root.on_show_edit()
-                            
+                                    TextInput:
+                                        id: line_number
+                                        size_hint: None, 1
+                                        readonly: True
+                                        background_color: 1, 1, 1, 0
+                                        foreground_color: 1, 1, 1, 1
+                                    KVLangArea:
+                                        id: code_input
+                                        size_hint_y: None
+                                        height: max(scroll.height, self.minimum_height)
+                                        on_show_edit: root.on_show_edit()
                             Button:
                                 size_hint_y: None
                                 size_hint_x: 0.1
@@ -1175,6 +1294,7 @@
         x: splitter_tree.width
         width: root.width - splitter_tree.width
         do_default_tab: False
+        tab_width: None
 
         DesignerTabbedPanelItem:
             text: 'UI Creator'
@@ -1202,6 +1322,35 @@
                 Toolbox:
                     id: toolbox
 
+<DesignerCloseableTab>:
+    color: 0,0,0,0
+    disabled_color: self.color
+    # variable tab_width
+    text: root.title
+    size_hint_x: None
+    width: min(self.texture_size[0] + 40, 200)
+    BoxLayout:
+        pos: root.pos
+        size_hint: None, None
+        size: root.size
+        padding: 3
+        Label:
+            id: lbl
+            text: root.text
+            shorten: True
+            shorten_from: 'right'
+            text_size: self.size
+            valign: 'middle'
+            halign: 'center'
+            markup: True
+        BoxLayout:
+            size_hint: None, 1
+            orientation: 'vertical'
+            width: 22
+            Image:
+                source: 'atlas://data/images/defaulttheme/close'
+                on_touch_down:
+                    if self.collide_point(*args[1].pos) : root.dispatch('on_close')
 <Designer>:
     statusbar: statusbar
     actionbar: actionbar
@@ -1212,7 +1361,7 @@
         id: actionbar
         pos_hint: {'top': 1}
         on_height: root.on_actionbar_height()
-        ActionView:
+        DesignerActionView:
             ActionPrevious:
                 title: 'Kivy Designer'
                 with_previous: False
