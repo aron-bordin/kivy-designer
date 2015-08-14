@@ -1318,6 +1318,10 @@
                 dropdown_cls: ContextMenu
                 disabled: True
                 DesignerActionButton:
+                    id: actn_btn_buildozer_init
+                    text: 'Buildozer Init'
+                    on_release: root.designer_tools.buildozer_init()
+                DesignerActionButton:
                     id: actn_btn_export_png
                     text: 'Export .png'
                     on_release: root.designer_tools.export_png()

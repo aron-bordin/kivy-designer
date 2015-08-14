@@ -1,12 +1,13 @@
 import datetime
 import os
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.popup import Popup
+import shutil
 import designer
 
 from kivy.event import EventDispatcher
 from kivy.properties import ObjectProperty, StringProperty
-
+from designer.confirmation_dialog import ConfirmationDialog
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.popup import Popup
 from designer.helper_functions import ignore_proj_watcher, show_alert
 
 
@@ -124,6 +125,8 @@ class DesignerTools(EventDispatcher):
         self.designer.ui_creator.kivy_console.run_command(cmd)
 
     def create_setup_py(self):
+        '''Runs the GUI to create a setup.py file
+        '''
         proj_loader = self.designer.project_loader
         proj_dir = proj_loader.proj_dir
         designer_content = self.designer.designer_content
@@ -169,3 +172,46 @@ __pycache__/'''
 
         f = open(gitignore_path, 'w').write(gitignore)
         status.show_message('.gitignore created successfully', 5)
+
+    def buildozer_init(self):
+        '''Checks if the .spec exists or not; and when possible, calls
+            _perform_buildozer_init
+        '''
+
+        proj_loader = self.designer.project_loader
+        proj_dir = proj_loader.proj_dir
+        spec_file = os.path.join(proj_dir, 'buildozer.spec')
+
+        if os.path.exists(spec_file):
+            self._confirm_dlg = ConfirmationDialog(
+                message='The buildozer.spec file already exist.'
+                                        '\nDo you want to create a new spec?')
+            self._popup = Popup(title='Buildozer init',
+                                content=self._confirm_dlg,
+                                size_hint=(None, None),
+                                size=('250pt', '150pt'),
+                                auto_dismiss=False)
+            self._confirm_dlg.bind(on_ok=self._perform_buildozer_init,
+                                   on_cancel=self._popup.dismiss)
+            self._popup.open()
+        else:
+            self._perform_buildozer_init()
+
+    @ignore_proj_watcher
+    def _perform_buildozer_init(self, *args):
+        '''Copies the spec from new_templates/default.spec to the project
+        folder
+        '''
+        self._popup.dismiss()
+
+        proj_loader = self.designer.project_loader
+        proj_dir = proj_loader.proj_dir
+        spec_file = os.path.join(proj_dir, 'buildozer.spec')
+
+        _dir = os.path.dirname(designer.__file__)
+        _dir = os.path.split(_dir)[0]
+        templates_dir = os.path.join(_dir, 'new_templates')
+        shutil.copy(os.path.join(templates_dir, 'default.spec'), spec_file)
+
+        self.designer.designer_content.update_tree_view(
+            self.designer.project_loader)
