@@ -1,4 +1,3 @@
-from designer.helper_functions import get_designer
 from kivy.core.window import Keyboard, Window
 from kivy.lang import Builder
 from kivy.metrics import dp
@@ -16,6 +15,7 @@ from kivy.uix.settings import SettingItem, SettingSpacer
 from kivy.uix.togglebutton import ToggleButton
 from kivy.uix.widget import Widget
 
+from designer.utils.utils import get_designer
 
 Builder.load_string('''
 <SettingDict>:
