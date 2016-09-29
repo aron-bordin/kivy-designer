@@ -1,3 +1,4 @@
+from designer.utils.toolbox_widgets import toolbox_widgets
 from kivy.clock import Clock
 from kivy.factory import Factory
 from kivy.metrics import pt
@@ -5,8 +6,6 @@ from kivy.properties import ObjectProperty
 from kivy.uix.accordion import AccordionItem
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
-
-from designer.utils.toolbox_widgets import toolbox_widgets
 
 
 class ToolboxCategory(AccordionItem):

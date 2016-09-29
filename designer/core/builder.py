@@ -2,6 +2,14 @@ import os
 import shutil
 import sys
 
+import designer
+from designer.uix.confirmation_dialog import ConfirmationDialog
+from designer.utils import constants
+from designer.utils.utils import (
+    get_current_project,
+    get_fs_encoding,
+    get_kd_data_dir,
+)
 from kivy.event import EventDispatcher
 from kivy.properties import (
     Clock,
@@ -11,11 +19,6 @@ from kivy.properties import (
     StringProperty,
 )
 from kivy.uix.popup import Popup
-
-import designer
-from designer.uix.confirmation_dialog import ConfirmationDialog
-from designer.utils import constants
-from designer.utils.utils import get_current_project, get_fs_encoding, get_kd_data_dir
 
 
 class Builder(EventDispatcher):
@@ -100,7 +103,8 @@ class Buildozer(Builder):
     def _perform_create_spec(self, *args):
         '''Creates the default buildozer.spec file
         '''
-        templates_dir = os.path.join(get_kd_data_dir(), constants.DIR_NEW_TEMPLATE)
+        templates_dir = os.path.join(get_kd_data_dir(),
+                                     constants.DIR_NEW_TEMPLATE)
         shutil.copy(os.path.join(templates_dir, 'default.spec'),
                     os.path.join(self.profiler.project_path, 'buildozer.spec'))
 

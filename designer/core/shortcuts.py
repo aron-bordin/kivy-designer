@@ -1,6 +1,5 @@
-from kivy.core.window import Keyboard, Window
-
 from designer.utils.utils import get_designer
+from kivy.core.window import Keyboard, Window
 
 
 class Shortcuts(object):

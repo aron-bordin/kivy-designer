@@ -1,18 +1,13 @@
 import re
 
+from designer.components.property_viewer import PropertyLabel, PropertyViewer
+from designer.uix.info_bubble import InfoBubble
+from designer.utils.utils import get_current_project, get_designer, show_message
 from kivy.clock import Clock
 from kivy.properties import BooleanProperty, ObjectProperty, StringProperty
 from kivy.uix.button import Button
 from kivy.uix.dropdown import DropDown
 from kivy.uix.textinput import TextInput
-
-from designer.components.property_viewer import PropertyLabel, PropertyViewer
-from designer.uix.info_bubble import InfoBubble
-from designer.utils.utils import (
-    get_current_project,
-    get_designer,
-    show_message,
-)
 
 
 class EventHandlerTextInput(TextInput):

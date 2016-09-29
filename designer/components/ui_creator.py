@@ -1,9 +1,8 @@
+from designer.utils.utils import get_designer
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.properties import ObjectProperty
 from kivy.uix.floatlayout import FloatLayout
-
-from designer.utils.utils import get_designer
 
 
 class UICreator(FloatLayout):

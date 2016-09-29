@@ -2,20 +2,6 @@ import os
 import subprocess
 import threading
 
-from git import GitCommandError, RemoteProgress, Repo
-from git.exc import InvalidGitRepositoryError
-from kivy.core.window import Window
-from kivy.properties import (
-    BooleanProperty,
-    Clock,
-    ObjectProperty,
-    StringProperty,
-)
-from kivy.uix.label import Label
-from kivy.uix.popup import Popup
-from pygments.lexers.diff import DiffLexer
-
-import designer
 from designer.components.designer_content import DesignerCloseableTab
 from designer.uix.action_items import (
     DesignerActionSubMenu,
@@ -28,10 +14,23 @@ from designer.utils.utils import (
     FakeSettingList,
     get_current_project,
     get_designer,
+    get_kd_dir,
     ignore_proj_watcher,
     show_alert,
     show_message,
-    get_kd_dir)
+)
+from git import GitCommandError, RemoteProgress, Repo
+from git.exc import InvalidGitRepositoryError
+from kivy.core.window import Window
+from kivy.properties import (
+    BooleanProperty,
+    Clock,
+    ObjectProperty,
+    StringProperty,
+)
+from kivy.uix.label import Label
+from kivy.uix.popup import Popup
+from pygments.lexers.diff import DiffLexer
 
 
 class GitRemoteProgress(RemoteProgress):
@@ -113,7 +112,8 @@ class DesignerGit(DesignerActionSubMenu):
             self.dispatch('on_branch', branch_name)
 
             if os.name == 'posix':
-                script = os.path.join(get_kd_dir(), 'tools', 'ssh-agent', 'ssh.sh')
+                script = os.path.join(get_kd_dir(),
+                                      'tools', 'ssh-agent', 'ssh.sh')
                 self.repo.git.update_environment(GIT_SSH_COMMAND=script)
         except InvalidGitRepositoryError:
             self.is_repo = False

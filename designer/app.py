@@ -5,36 +5,16 @@ import webbrowser
 from distutils.dir_util import copy_tree
 
 import kivy
-from kivy.app import App
-from kivy.base import ExceptionHandler, ExceptionManager
-from kivy.clock import Clock
-from kivy.config import Config
-from kivy.core.window import Window
-from kivy.factory import Factory
-from kivy.garden.filebrowser import FileBrowser
-from kivy.graphics.context_instructions import Color
-from kivy.graphics.vertex_instructions import Line
-from kivy.properties import (
-    BooleanProperty,
-    ListProperty,
-    ObjectProperty,
-    StringProperty,
-    partial,
-)
-from kivy.uix.carousel import Carousel
-from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.popup import Popup
-from kivy.uix.screenmanager import ScreenManager
-from kivy.uix.tabbedpanel import TabbedPanel
-from kivy.uix.widget import Widget
-
 from designer.components.buildozer_spec_editor import BuildozerSpecEditor
 from designer.components.designer_content import DesignerContent
-from designer.components.dialogs.add_file import AddFileDialog
 from designer.components.dialogs.about import AboutDialog
+from designer.components.dialogs.add_file import AddFileDialog
 from designer.components.dialogs.help import HelpDialog
+from designer.components.dialogs.new_project import (
+    NEW_PROJECTS,
+    NewProjectDialog,
+)
 from designer.components.dialogs.recent import RecentDialog
-from designer.components.dialogs.new_project import NEW_PROJECTS, NewProjectDialog
 from designer.components.edit_contextual_view import EditContView
 from designer.components.playground import PlaygroundDragElement
 from designer.components.run_contextual_view import ModulesContView
@@ -60,13 +40,37 @@ from designer.utils.toolbox_widgets import toolbox_widgets
 from designer.utils.utils import (
     get_config_dir,
     get_fs_encoding,
+    get_kd_data_dir,
     get_kd_dir,
     ignore_proj_watcher,
     show_alert,
     show_error_console,
     show_message,
     update_info,
-    get_kd_data_dir)
+)
+from kivy.app import App
+from kivy.base import ExceptionHandler, ExceptionManager
+from kivy.clock import Clock
+from kivy.config import Config
+from kivy.core.window import Window
+from kivy.factory import Factory
+from kivy.garden.filebrowser import FileBrowser
+from kivy.graphics.context_instructions import Color
+from kivy.graphics.vertex_instructions import Line
+from kivy.properties import (
+    BooleanProperty,
+    ListProperty,
+    ObjectProperty,
+    StringProperty,
+    partial,
+)
+from kivy.uix.carousel import Carousel
+from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.popup import Popup
+from kivy.uix.screenmanager import ScreenManager
+from kivy.uix.tabbedpanel import TabbedPanel
+from kivy.uix.widget import Widget
+
 
 __all__ = ('DesignerApp', )
 
@@ -764,7 +768,8 @@ class Designer(FloatLayout):
         kv_file = NEW_PROJECTS[template][0]
         py_file = NEW_PROJECTS[template][1]
 
-        templates_dir = os.path.join(get_kd_data_dir(), constants.DIR_NEW_TEMPLATE)
+        templates_dir = os.path.join(get_kd_data_dir(),
+                                     constants.DIR_NEW_TEMPLATE)
         shutil.copy(os.path.join(templates_dir, py_file),
                     os.path.join(new_proj_dir, "main.py"))
 
@@ -1681,29 +1686,39 @@ class DesignerApp(App):
         Factory.register('Playground', module='designer.components.playground')
         Factory.register('Toolbox', module='designer.components.toolbox')
         Factory.register('StatusBar', module='designer.components.statusbar')
-        Factory.register('PropertyViewer', module='designer.components.property_viewer')
-        Factory.register('EventViewer', module='designer.components.event_viewer')
-        Factory.register('WidgetsTree', module='designer.components.widgets_tree')
+        Factory.register('PropertyViewer',
+                         module='designer.components.property_viewer')
+        Factory.register('EventViewer',
+                         module='designer.components.event_viewer')
+        Factory.register('WidgetsTree',
+                         module='designer.components.widgets_tree')
         Factory.register('UICreator', module='designer.components.ui_creator')
-        Factory.register('DesignerGit', module='designer.tools.git')
+        Factory.register('DesignerGit', module='designer.tools.git_integration')
         Factory.register('DesignerContent',
                          module='designer.components.designer_content')
-        Factory.register('KivyConsole', module='designer.components.kivy_console')
-        Factory.register('KVLangAreaScroll', module='designer.components.kv_lang_area')
+        Factory.register('KivyConsole',
+                         module='designer.components.kivy_console')
+        Factory.register('KVLangAreaScroll',
+                         module='designer.components.kv_lang_area')
         Factory.register('PythonConsole', module='designer.uix.py_console')
         Factory.register('DesignerContent',
                          module='designer.components.designer_content')
-        Factory.register('EventDropDown', module='designer.components.event_viewer')
+        Factory.register('EventDropDown',
+                         module='designer.components.event_viewer')
         Factory.register('DesignerActionGroup',
                          module='designer.uix.action_items')
         Factory.register('DesignerActionButton',
                          module='designer.uix.action_items')
         Factory.register('DesignerActionSubMenu',
                          module='designer.uix.action_items')
-        Factory.register('DesignerStartPage', module='designer.components.start_page')
-        Factory.register('DesignerLinkLabel', module='designer.components.start_page')
-        Factory.register('RecentFilesBox', module='designer.components.start_page')
-        Factory.register('ContextMenu', module='designer.components.edit_contextual_view')
+        Factory.register('DesignerStartPage',
+                         module='designer.components.start_page')
+        Factory.register('DesignerLinkLabel',
+                         module='designer.components.start_page')
+        Factory.register('RecentFilesBox',
+                         module='designer.components.start_page')
+        Factory.register('ContextMenu',
+                         module='designer.components.edit_contextual_view')
         Factory.register('PlaygroundSizeSelector',
                          module='designer.components.playground_size_selector')
         Factory.register('CodeInputFind',

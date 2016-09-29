@@ -1,3 +1,6 @@
+from designer.core.undo_manager import PropOperation
+from designer.uix.settings import SettingListContent
+from designer.utils.utils import FakeSettingList, get_designer
 from kivy.core.window import Window
 from kivy.properties import (
     BooleanProperty,
@@ -12,10 +15,6 @@ from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
-
-from designer.core.undo_manager import PropOperation
-from designer.uix.settings import SettingListContent
-from designer.utils.utils import FakeSettingList, get_designer
 
 
 class PropertyLabel(Label):

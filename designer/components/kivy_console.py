@@ -88,6 +88,7 @@ import subprocess
 import sys
 from functools import partial
 
+from designer.utils.utils import get_fs_encoding
 from kivy.app import runTouchApp
 from kivy.clock import Clock
 from kivy.compat import PY2
@@ -107,7 +108,6 @@ from kivy.uix.textinput import TextInput
 from kivy.utils import platform
 from pygments.lexers.shell import BashSessionLexer
 
-from designer.utils.utils import get_fs_encoding
 
 try:
     import thread

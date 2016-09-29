@@ -1,4 +1,4 @@
-from kivy.properties import StringProperty, ObjectProperty, BooleanProperty
+from kivy.properties import BooleanProperty, ObjectProperty, StringProperty
 from kivy.uix.boxlayout import BoxLayout
 
 

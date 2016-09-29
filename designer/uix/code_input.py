@@ -1,16 +1,11 @@
 import re
 
+from designer.utils.utils import get_current_project, get_designer, show_alert
 from kivy import Config
 from kivy.properties import BooleanProperty, StringProperty
 from kivy.uix.codeinput import CodeInput
 from kivy.utils import get_color_from_hex
 from pygments import styles
-
-from designer.utils.utils import (
-    get_current_project,
-    get_designer,
-    show_alert,
-)
 
 
 class DesignerCodeInput(CodeInput):

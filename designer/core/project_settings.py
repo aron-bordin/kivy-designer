@@ -1,10 +1,10 @@
 import os
 
+from designer.utils.utils import get_kd_data_dir, ignore_proj_watcher
 from kivy.config import ConfigParser
 from kivy.properties import ObjectProperty
 from kivy.uix.settings import Settings
 
-from designer.utils.utils import ignore_proj_watcher, get_kd_data_dir
 
 PROJ_DESIGNER = '.designer'
 PROJ_CONFIG = os.path.join(PROJ_DESIGNER, 'config.ini')

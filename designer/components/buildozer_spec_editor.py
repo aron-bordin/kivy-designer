@@ -3,6 +3,9 @@ import os
 import tempfile
 import webbrowser
 
+import designer
+from designer.uix.settings import SettingDict, SettingList
+from designer.utils.utils import get_kd_data_dir, ignore_proj_watcher
 from kivy.properties import ConfigParser, ObjectProperty, StringProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.settings import (
@@ -13,10 +16,6 @@ from kivy.uix.settings import (
     SettingsPanel,
 )
 from pygments.lexers.configs import IniLexer
-
-import designer
-from designer.uix.settings import SettingDict, SettingList
-from designer.utils.utils import ignore_proj_watcher, get_kd_data_dir
 
 
 class SpecContentPanel(ContentPanel):

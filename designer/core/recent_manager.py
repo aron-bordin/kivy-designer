@@ -2,6 +2,7 @@ import os
 
 from designer.utils.utils import get_config_dir, get_fs_encoding
 
+
 RECENT_FILES_NAME = 'recent_files'
 
 

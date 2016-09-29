@@ -1,6 +1,8 @@
 from functools import partial
 from os.path import join
 
+from designer.utils import constants
+from designer.utils.utils import get_kd_data_dir, get_kd_dir
 from kivy.adapters.listadapter import ListAdapter
 from kivy.core.window import Keyboard, Window
 from kivy.factory import Factory
@@ -9,8 +11,6 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.image import Image
 from kivy.uix.listview import ListView
 
-from designer.utils import constants
-from designer.utils.utils import get_kd_dir, get_kd_data_dir
 
 NEW_PROJECTS = {
     'FloatLayout': ('template_floatlayout_kv',

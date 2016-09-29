@@ -4,14 +4,13 @@ import shutil
 import sys
 from distutils.spawn import find_executable
 
+from designer.uix.settings import SettingList, SettingShortcut
+from designer.utils import constants
+from designer.utils.utils import get_config_dir, get_kd_data_dir, get_kd_dir
 from kivy.config import ConfigParser
 from kivy.properties import ObjectProperty
 from kivy.uix.settings import Settings
 from pygments import styles
-
-from designer.uix.settings import SettingList, SettingShortcut
-from designer.utils import constants
-from designer.utils.utils import get_config_dir, get_kd_data_dir, get_kd_dir
 
 
 # monkey backport! (https://github.com/kivy/kivy/pull/2288)

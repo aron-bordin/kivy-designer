@@ -1,5 +1,9 @@
 import os
 
+from designer.components.buildozer_spec_editor import BuildozerSpecEditor
+from designer.uix.confirmation_dialog import ConfirmationDialog
+from designer.uix.py_code_input import PyScrollView
+from designer.utils.utils import get_designer, show_message
 from kivy.app import App
 from kivy.properties import (
     BooleanProperty,
@@ -13,11 +17,6 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.popup import Popup
 from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader, TabbedPanelItem
 from kivy.uix.treeview import TreeViewLabel
-
-from designer.components.buildozer_spec_editor import BuildozerSpecEditor
-from designer.uix.confirmation_dialog import ConfirmationDialog
-from designer.uix.py_code_input import PyScrollView
-from designer.utils.utils import get_designer, show_message
 
 
 SUPPORTED_EXT = ('.py', '.py2', '.kv', '.py3', '.txt', '.diff', )

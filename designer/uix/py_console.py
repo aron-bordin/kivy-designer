@@ -2,6 +2,7 @@ import code
 import sys
 import threading
 
+from designer.utils.utils import show_message
 from kivy.base import runTouchApp
 from kivy.clock import Clock
 from kivy.lang import Builder
@@ -15,7 +16,6 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.codeinput import CodeInput
 from pygments.lexers.python import PythonConsoleLexer
 
-from designer.utils.utils import show_message
 
 try:
     from rlcompleter import Completer

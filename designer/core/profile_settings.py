@@ -2,6 +2,10 @@ import os
 import os.path
 import shutil
 
+import designer
+from designer.uix.confirmation_dialog import ConfirmationDialog
+from designer.utils import constants
+from designer.utils.utils import get_config_dir, get_kd_data_dir
 from kivy.config import ConfigParser
 from kivy.properties import DictProperty, ObjectProperty
 from kivy.uix.popup import Popup
@@ -11,11 +15,6 @@ from kivy.uix.settings import (
     MenuSidebar,
     Settings,
 )
-
-import designer
-from designer.uix.confirmation_dialog import ConfirmationDialog
-from designer.utils import constants
-from designer.utils.utils import get_config_dir, get_kd_data_dir
 
 
 class ProfileContentPanel(ContentPanel):
@@ -134,7 +133,8 @@ class ProfileSettings(Settings):
         self.PROFILES_PATH = os.path.join(get_config_dir(),
                                           constants.DIR_PROFILES)
 
-        self.DEFAULT_PROFILES = os.path.join(get_kd_data_dir(), constants.DIR_PROFILES)
+        self.DEFAULT_PROFILES = os.path.join(get_kd_data_dir(),
+                                             constants.DIR_PROFILES)
 
         if not os.path.exists(self.PROFILES_PATH):
             shutil.copytree(self.DEFAULT_PROFILES, self.PROFILES_PATH)

@@ -5,6 +5,12 @@ import os
 import re
 import sys
 
+from designer.utils.utils import (
+    get_app_widget,
+    get_designer,
+    show_error_console,
+    show_message,
+)
 from kivy.event import EventDispatcher
 from kivy.factory import Factory
 from kivy.lang import Builder
@@ -21,12 +27,6 @@ from six import exec_
 from watchdog.events import RegexMatchingEventHandler
 from watchdog.observers import Observer
 
-from designer.utils.utils import (
-    get_app_widget,
-    get_designer,
-    show_error_console,
-    show_message,
-)
 
 IGNORED_PATHS = ('.designer', '.buildozer', '.git', '__pycache__', 'bin',)
 IGNORED_EXTS = ('.pyc',)

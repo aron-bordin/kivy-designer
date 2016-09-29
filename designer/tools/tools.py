@@ -3,20 +3,20 @@ import os
 import shutil
 import sys
 
-from kivy.event import EventDispatcher
-from kivy.properties import ObjectProperty, StringProperty
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.popup import Popup
-
 from designer.uix.confirmation_dialog import ConfirmationDialog
 from designer.utils import constants
 from designer.utils.utils import (
     get_current_project,
     get_designer,
+    get_kd_data_dir,
     get_kd_dir,
     ignore_proj_watcher,
     show_alert,
-    get_kd_data_dir)
+)
+from kivy.event import EventDispatcher
+from kivy.properties import ObjectProperty, StringProperty
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.popup import Popup
 
 
 #### UIs ####
@@ -219,7 +219,8 @@ __pycache__/'''
         proj_dir = get_current_project().path
         spec_file = os.path.join(proj_dir, 'buildozer.spec')
 
-        templates_dir = os.path.join(get_kd_data_dir(), constants.DIR_NEW_TEMPLATE)
+        templates_dir = os.path.join(get_kd_data_dir(),
+                                     constants.DIR_NEW_TEMPLATE)
         shutil.copy(os.path.join(templates_dir, 'default.spec'), spec_file)
 
         self.designer.designer_content.update_tree_view(get_current_project())

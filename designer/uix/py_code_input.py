@@ -1,6 +1,6 @@
 import jedi
-from designer.uix.completion_bubble import CompletionBubble
 from designer.uix.code_input import DesignerCodeInput
+from designer.uix.completion_bubble import CompletionBubble
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.properties import BooleanProperty, ObjectProperty

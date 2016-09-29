@@ -2,6 +2,18 @@ import functools
 import os
 import re
 
+from designer.core.undo_manager import WidgetDragOperation, WidgetOperation
+from designer.uix.confirmation_dialog import ConfirmationDialogSave
+from designer.uix.settings import SettingListContent
+from designer.utils.toolbox_widgets import toolbox_widgets as widgets_common
+from designer.utils.utils import (
+    FakeSettingList,
+    get_app_widget,
+    get_current_project,
+    get_designer,
+    ignore_proj_watcher,
+    show_message,
+)
 from kivy.app import App
 from kivy.base import EventLoop
 from kivy.clock import Clock
@@ -28,19 +40,6 @@ from kivy.uix.scatter import ScatterPlane
 from kivy.uix.scatterlayout import ScatterLayout
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.tabbedpanel import TabbedPanel
-
-from designer.core.undo_manager import WidgetDragOperation, WidgetOperation
-from designer.uix.confirmation_dialog import ConfirmationDialogSave
-from designer.uix.settings import SettingListContent
-from designer.utils.toolbox_widgets import toolbox_widgets as widgets_common
-from designer.utils.utils import (
-    FakeSettingList,
-    get_app_widget,
-    get_current_project,
-    get_designer,
-    ignore_proj_watcher,
-    show_message,
-)
 
 
 class PlaygroundDragElement(BoxLayout):

@@ -1,5 +1,13 @@
 import re
 
+from designer.uix.code_input import DesignerCodeInput
+from designer.utils.utils import (
+    get_current_project,
+    get_indent_str,
+    get_indentation,
+    get_line_end_pos,
+    get_line_start_pos,
+)
 from kivy.clock import Clock
 from kivy.properties import BooleanProperty, ObjectProperty, StringProperty
 from kivy.uix.carousel import Carousel
@@ -9,15 +17,6 @@ from kivy.uix.tabbedpanel import (
     TabbedPanel,
     TabbedPanelContent,
     TabbedPanelHeader,
-)
-
-from designer.uix.code_input import DesignerCodeInput
-from designer.utils.utils import (
-    get_current_project,
-    get_indent_str,
-    get_indentation,
-    get_line_end_pos,
-    get_line_start_pos,
 )
 
 

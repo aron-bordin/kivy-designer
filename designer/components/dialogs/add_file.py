@@ -1,12 +1,11 @@
 import os
 import shutil
 
+from designer.utils.utils import ignore_proj_watcher
 from kivy.garden.filebrowser import FileBrowser
 from kivy.properties import ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
-
-from designer.utils.utils import ignore_proj_watcher
 
 
 class AddFileDialog(BoxLayout):

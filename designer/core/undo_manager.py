@@ -1,7 +1,6 @@
+from designer.utils.utils import get_current_project
 from kivy.uix.checkbox import CheckBox
 from kivy.uix.textinput import TextInput
-
-from designer.utils.utils import get_current_project
 
 
 class OperationBase(object):

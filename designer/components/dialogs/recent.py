@@ -1,9 +1,8 @@
+from designer.utils.utils import get_fs_encoding
 from kivy.adapters.listadapter import ListAdapter
 from kivy.properties import ObjectProperty, partial
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.listview import ListItemButton
-
-from designer.utils.utils import get_fs_encoding
 
 
 class RecentItemButton(ListItemButton):
