@@ -55,6 +55,7 @@ from designer.uix.confirmation_dialog import (
 )
 from designer.uix.input_dialog import InputDialog
 from designer.uix.sandbox import DesignerSandbox
+from designer.utils import constants
 from designer.utils.toolbox_widgets import toolbox_widgets
 from designer.utils.utils import (
     get_config_dir,
@@ -65,16 +66,12 @@ from designer.utils.utils import (
     show_error_console,
     show_message,
     update_info,
-)
+    get_kd_data_dir)
 
 __all__ = ('DesignerApp', )
 
 
 kivy.require('1.9.1')
-
-
-NEW_PROJECT_DIR_NAME = 'new_proj'
-NEW_TEMPLATES_DIR = 'new_templates'
 
 
 class Designer(FloatLayout):
@@ -408,8 +405,7 @@ class Designer(FloatLayout):
             return False
         if self.help_dlg is None:
             self.help_dlg = HelpDialog()
-            d = get_kd_dir()
-            self.help_dlg.rst.source = os.path.join(d, 'help.rst')
+            self.help_dlg.rst.source = os.path.join(get_kd_dir(), 'help.rst')
 
         self.popup = Popup(title='Kivy Designer Help', content=self.help_dlg,
                            size_hint=(0.95, 0.95),
@@ -758,7 +754,7 @@ class Designer(FloatLayout):
         self.close_popup()
 
         new_proj_dir = os.path.join(get_config_dir(),
-                                    NEW_PROJECT_DIR_NAME)
+                                    constants.NEW_PROJECT_DIR_NAME)
         if os.path.exists(new_proj_dir):
             shutil.rmtree(new_proj_dir)
 
@@ -768,7 +764,7 @@ class Designer(FloatLayout):
         kv_file = NEW_PROJECTS[template][0]
         py_file = NEW_PROJECTS[template][1]
 
-        templates_dir = os.path.join(get_kd_dir(), NEW_TEMPLATES_DIR)
+        templates_dir = os.path.join(get_kd_data_dir(), constants.DIR_NEW_TEMPLATE)
         shutil.copy(os.path.join(templates_dir, py_file),
                     os.path.join(new_proj_dir, "main.py"))
 

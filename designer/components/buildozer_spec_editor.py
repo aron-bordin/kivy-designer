@@ -16,7 +16,7 @@ from pygments.lexers.configs import IniLexer
 
 import designer
 from designer.uix.settings import SettingDict, SettingList
-from designer.utils.utils import ignore_proj_watcher
+from designer.utils.utils import ignore_proj_watcher, get_kd_data_dir
 
 
 class SpecContentPanel(ContentPanel):
@@ -153,21 +153,18 @@ class BuildozerSpecEditor(Settings):
         self.proj_dir = proj_dir
         self.SPEC_PATH = os.path.join(proj_dir, 'buildozer.spec')
 
-        _dir = os.path.dirname(designer.__file__)
-        _dir = os.path.split(_dir)[0]
-
         self.config_parser.read(self.SPEC_PATH)
         self.add_json_panel('Application', self.config_parser,
-                            os.path.join(_dir, 'designer',
+                            os.path.join(get_kd_data_dir(),
                             'settings', 'buildozer_spec_app.json'))
         self.add_json_panel('Android', self.config_parser,
-                            os.path.join(_dir, 'designer',
+                            os.path.join(get_kd_data_dir(),
                             'settings', 'buildozer_spec_android.json'))
         self.add_json_panel('iOS', self.config_parser,
-                            os.path.join(_dir, 'designer',
+                            os.path.join(get_kd_data_dir(),
                             'settings', 'buildozer_spec_ios.json'))
         self.add_json_panel('Buildozer', self.config_parser,
-                            os.path.join(_dir, 'designer',
+                            os.path.join(get_kd_data_dir(),
                             'settings', 'buildozer_spec_buildozer.json'))
 
         raw_spec = SpecCodeInput(spec_path=self.SPEC_PATH)

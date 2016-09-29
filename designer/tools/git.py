@@ -31,7 +31,7 @@ from designer.utils.utils import (
     ignore_proj_watcher,
     show_alert,
     show_message,
-)
+    get_kd_dir)
 
 
 class GitRemoteProgress(RemoteProgress):
@@ -112,10 +112,8 @@ class DesignerGit(DesignerActionSubMenu):
             branch_name = self.repo.active_branch.name
             self.dispatch('on_branch', branch_name)
 
-            _dir = os.path.dirname(designer.__file__)
-            _dir = os.path.split(_dir)[0]
             if os.name == 'posix':
-                script = os.path.join(_dir, 'tools', 'ssh-agent', 'ssh.sh')
+                script = os.path.join(get_kd_dir(), 'tools', 'ssh-agent', 'ssh.sh')
                 self.repo.git.update_environment(GIT_SSH_COMMAND=script)
         except InvalidGitRepositoryError:
             self.is_repo = False
@@ -173,11 +171,9 @@ class DesignerGit(DesignerActionSubMenu):
         returns True else runs the tools/ssh-agent/ssh.bat and returns False
         '''
         if os.name == 'nt':
-            _dir = os.path.dirname(designer.__file__)
-            _dir = os.path.split(_dir)[0]
-            script = os.path.join(_dir, 'tools', 'ssh-agent', 'ssh.bat')
-            status_txt = os.path.join(_dir, 'tools', 'ssh-agent',
-                                                        'ssh_status.txt')
+            script = os.path.join(get_kd_dir(), 'tools', 'ssh-agent', 'ssh.bat')
+            status_txt = os.path.join(get_kd_dir(), 'tools', 'ssh-agent',
+                                      'ssh_status.txt')
             status = open(status_txt, 'r').read()
             status = status.strip()
             if status == '1':

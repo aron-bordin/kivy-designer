@@ -9,11 +9,9 @@ from kivy.properties import ObjectProperty
 from kivy.uix.settings import Settings
 from pygments import styles
 
-import designer
 from designer.uix.settings import SettingList, SettingShortcut
-from designer.utils.utils import get_config_dir
-
-DESIGNER_CONFIG_FILE_NAME = 'config.ini'
+from designer.utils import constants
+from designer.utils.utils import get_config_dir, get_kd_data_dir, get_kd_dir
 
 
 # monkey backport! (https://github.com/kivy/kivy/pull/2288)
@@ -55,12 +53,10 @@ class DesignerSettings(Settings):
         '''
         self.config_parser = ConfigParser(name='DesignerSettings')
         DESIGNER_CONFIG = os.path.join(get_config_dir(),
-                                       DESIGNER_CONFIG_FILE_NAME)
+                                       constants.DESIGNER_CONFIG_FILE_NAME)
 
-        _dir = os.path.dirname(designer.__file__)
-        _dir = os.path.split(_dir)[0]
-
-        DEFAULT_CONFIG = os.path.join(_dir, DESIGNER_CONFIG_FILE_NAME)
+        DEFAULT_CONFIG = os.path.join(get_kd_dir(),
+                                      constants.DESIGNER_CONFIG_FILE_NAME)
         if not os.path.exists(DESIGNER_CONFIG):
             shutil.copyfile(DEFAULT_CONFIG,
                             DESIGNER_CONFIG)
@@ -71,7 +67,7 @@ class DesignerSettings(Settings):
         # creates a panel before insert it to update code input theme list
         panel = self.create_json_panel('Kivy Designer Settings',
                                         self.config_parser,
-                            os.path.join(_dir, 'designer',
+                            os.path.join(get_kd_data_dir(),
                                          'settings', 'designer_settings.json'))
         uid = panel.uid
         if self.interface is not None:
@@ -103,13 +99,13 @@ class DesignerSettings(Settings):
                 self.config_parser.write()
 
         self.add_json_panel('Buildozer', self.config_parser,
-                            os.path.join(_dir, 'designer', 'settings',
+                            os.path.join(get_kd_data_dir(), 'settings',
                                          'buildozer_settings.json'))
         self.add_json_panel('Hanga', self.config_parser,
-                            os.path.join(_dir, 'designer', 'settings',
+                            os.path.join(get_kd_data_dir(), 'settings',
                                          'hanga_settings.json'))
         self.add_json_panel('Keyboard Shortcuts', self.config_parser,
-                            os.path.join(_dir, 'designer', 'settings',
+                            os.path.join(get_kd_data_dir(), 'settings',
                                          'shortcuts.json'))
 
     def on_config_change(self, *args):

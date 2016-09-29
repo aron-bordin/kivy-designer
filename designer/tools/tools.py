@@ -8,15 +8,15 @@ from kivy.properties import ObjectProperty, StringProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 
-import designer
 from designer.uix.confirmation_dialog import ConfirmationDialog
+from designer.utils import constants
 from designer.utils.utils import (
     get_current_project,
     get_designer,
     get_kd_dir,
     ignore_proj_watcher,
     show_alert,
-)
+    get_kd_data_dir)
 
 
 #### UIs ####
@@ -211,7 +211,7 @@ __pycache__/'''
 
     @ignore_proj_watcher
     def _perform_buildozer_init(self, *args):
-        '''Copies the spec from new_templates/default.spec to the project
+        '''Copies the spec from data/new_templates/default.spec to the project
         folder
         '''
         get_designer().close_popup()
@@ -219,9 +219,7 @@ __pycache__/'''
         proj_dir = get_current_project().path
         spec_file = os.path.join(proj_dir, 'buildozer.spec')
 
-        _dir = os.path.dirname(designer.__file__)
-        _dir = os.path.split(_dir)[0]
-        templates_dir = os.path.join(_dir, 'new_templates')
+        templates_dir = os.path.join(get_kd_data_dir(), constants.DIR_NEW_TEMPLATE)
         shutil.copy(os.path.join(templates_dir, 'default.spec'), spec_file)
 
         self.designer.designer_content.update_tree_view(get_current_project())

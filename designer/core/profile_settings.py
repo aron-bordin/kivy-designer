@@ -14,7 +14,8 @@ from kivy.uix.settings import (
 
 import designer
 from designer.uix.confirmation_dialog import ConfirmationDialog
-from designer.utils.utils import get_config_dir
+from designer.utils import constants
+from designer.utils.utils import get_config_dir, get_kd_data_dir
 
 
 class ProfileContentPanel(ContentPanel):
@@ -131,11 +132,9 @@ class ProfileSettings(Settings):
         '''
         self.settings_changed = False
         self.PROFILES_PATH = os.path.join(get_config_dir(),
-            'profiles')
+                                          constants.DIR_PROFILES)
 
-        _dir = os.path.dirname(designer.__file__)
-        _dir = os.path.split(_dir)[0]
-        self.DEFAULT_PROFILES = os.path.join(_dir, 'profiles')
+        self.DEFAULT_PROFILES = os.path.join(get_kd_data_dir(), constants.DIR_PROFILES)
 
         if not os.path.exists(self.PROFILES_PATH):
             shutil.copytree(self.DEFAULT_PROFILES, self.PROFILES_PATH)
@@ -145,9 +144,6 @@ class ProfileSettings(Settings):
     def update_panel(self):
         '''Update the MenuSidebar
         '''
-        _dir = os.path.dirname(designer.__file__)
-        _dir = os.path.split(_dir)[0]
-
         self.config_parsers = {}
         self.interface.menu.buttons_layout.clear_widgets()
         for _file in os.listdir(self.PROFILES_PATH):
@@ -169,8 +165,7 @@ class ProfileSettings(Settings):
             self.add_json_panel(prof_name,
                                 self.config_parsers[_file],
                                 os.path.join(
-                                    _dir,
-                                    'designer',
+                                    get_kd_data_dir(),
                                     'settings',
                                     'build_profile.json')
                                 )

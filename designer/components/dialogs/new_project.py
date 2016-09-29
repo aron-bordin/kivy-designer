@@ -9,7 +9,8 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.image import Image
 from kivy.uix.listview import ListView
 
-from designer.utils.utils import get_kd_dir
+from designer.utils import constants
+from designer.utils.utils import get_kd_dir, get_kd_data_dir
 
 NEW_PROJECTS = {
     'FloatLayout': ('template_floatlayout_kv',
@@ -28,9 +29,6 @@ NEW_PROJECTS = {
                     'template_tabbed_panel_py'),
     'TextInput and ScrollView': ('template_textinput_scrollview_kv',
                                  'template_textinput_scrollview_py')}
-
-NEW_TEMPLATES_DIR = 'new_templates'
-NEW_TEMPLATE_IMAGE_PATH = join(NEW_TEMPLATES_DIR, 'images')
 
 
 class NewProjectDialog(BoxLayout):
@@ -130,9 +128,8 @@ class NewProjectDialog(BoxLayout):
         '''
         name = adapter.selection[0].text.lower() + '.png'
         name = name.replace(' and ', '_')
-        image_source = join(NEW_TEMPLATE_IMAGE_PATH, name)
-        _dir = get_kd_dir()
-        image_source = join(_dir, image_source)
+        image_source = join(constants.NEW_TEMPLATE_IMAGE_PATH, name)
+        image_source = join(get_kd_data_dir(), image_source)
         parent = self.image.parent
         parent.remove_widget(self.image)
         self.image = Image(source=image_source)

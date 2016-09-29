@@ -4,9 +4,7 @@ from kivy.config import ConfigParser
 from kivy.properties import ObjectProperty
 from kivy.uix.settings import Settings
 
-import designer
-from designer.utils.utils import ignore_proj_watcher
-
+from designer.utils.utils import ignore_proj_watcher, get_kd_data_dir
 
 PROJ_DESIGNER = '.designer'
 PROJ_CONFIG = os.path.join(PROJ_DESIGNER, 'config.ini')
@@ -49,9 +47,8 @@ env =
             f.close()
 
         self.config_parser.read(file_path)
-        _dir = os.path.dirname(designer.__file__)
-        _dir = os.path.split(_dir)[0]
-        settings_dir = os.path.join(_dir, 'designer', 'settings')
+
+        settings_dir = os.path.join(get_kd_data_dir(), 'settings')
         self.add_json_panel('Shell Environment',
                             self.config_parser,
                             os.path.join(settings_dir,

@@ -128,10 +128,15 @@ def get_kd_dir():
     '''Return kivy designer source/binaries folder
     '''
     _dir = os.path.dirname(designer.__file__)
-    _dir = os.path.split(_dir)[0]
     if isinstance(_dir, bytes):
         _dir = _dir.decode(get_fs_encoding())
     return _dir
+
+
+def get_kd_data_dir():
+    '''Return kivy designer's data path
+    '''
+    return os.path.join(get_kd_dir(), 'data')
 
 
 def show_alert(title, msg, width=500, height=200):

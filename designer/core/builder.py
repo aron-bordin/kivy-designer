@@ -14,7 +14,8 @@ from kivy.uix.popup import Popup
 
 import designer
 from designer.uix.confirmation_dialog import ConfirmationDialog
-from designer.utils.utils import get_current_project, get_fs_encoding
+from designer.utils import constants
+from designer.utils.utils import get_current_project, get_fs_encoding, get_kd_data_dir
 
 
 class Builder(EventDispatcher):
@@ -99,9 +100,7 @@ class Buildozer(Builder):
     def _perform_create_spec(self, *args):
         '''Creates the default buildozer.spec file
         '''
-        _dir = os.path.dirname(designer.__file__)
-        _dir = os.path.split(_dir)[0]
-        templates_dir = os.path.join(_dir, 'new_templates')
+        templates_dir = os.path.join(get_kd_data_dir(), constants.DIR_NEW_TEMPLATE)
         shutil.copy(os.path.join(templates_dir, 'default.spec'),
                     os.path.join(self.profiler.project_path, 'buildozer.spec'))
 
